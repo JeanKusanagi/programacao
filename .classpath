@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="Guiao 1"/>
+	<classpathentry kind="src" path="Guiao 2"/>
+	<classpathentry kind="src" path="Guiao 3"/>
+	<classpathentry kind="src" path="Guiao 4"/>
+	<classpathentry kind="src" path="Guiao 5"/>
+	<classpathentry kind="src" path="Guiao 6"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
