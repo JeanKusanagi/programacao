@@ -1,7 +1,7 @@
-ProgramaÁ„o 1 2016-2017
+ÔªøPrograma√ß√£o 1 2016-2017
 MIECT UA
 
-O cÛdigo aqui disponibilizado n„o pode ser copiado mas pode ser visualizado. 
-O cÛdigo È fornecido tal como est· e embora tenha sido testado, poder· apresentar erros, pelos quais n„o me responsabilizo.
+O c√≥digo aqui disponibilizado n√£o pode ser copiado mas pode ser visualizado. 
+O c√≥digo √© fornecido tal como est√° e embora tenha sido testado, poder√° apresentar erros, pelos quais n√£o me responsabilizo.
 
 Pedro Teixeira
