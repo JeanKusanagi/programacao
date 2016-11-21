@@ -20,7 +20,7 @@
  * 
  */
 import java.util.Scanner;
-public class Ex6_2 {
+public class Ex9_2_b {
 
 	public static void main(String[] args) {
 		Scanner ler = new Scanner(System.in);
