@@ -19,65 +19,61 @@
  * MA 02110-1301, USA.
  * 
  */
+
+/* Exercício 6.1
+ * Escreva um programa que leia uma sequência de N números inteiros, sendo o valor N pedido ao
+ * utilizador antes do inicio da introdução dos números. O programa deve depois imprimir esses
+ * números pela ordem inversa com que foram inseridos.
+ */
+
 import java.util.Scanner;
 import java.io.*;
 
 public class Ex9_2_a {
 
-	public static void main(String[] args) {
-		Scanner ler = new Scanner(System.in);
+	static Scanner ler = new Scanner(System.in);
 
-		//Pede ao utilizador o nome do ficheiro 
-		System.out.printf("Leitor de texto\n--------\nPor favor introduza o nome do ficheiro de texto (com extensao): ");
-		String filename=ler.nextLine();
-		File file_toRead= new File (filename);
+	public static void main(String[] args) throws IOException {
+
+		//UI
+		System.out.printf("Inversor de sequencias numericas\n--------\n");
+
+		//Pede ao utilizador o nome do ficheiro  --> o enunciado refere para ser lido um ficheiro dados.txt mas o programa apresentado é mais versátil
+		File in_file= getFile();
 
 		//Valida o nome do ficheiro, ie pede um nome de ficheiro enquanto este não corresponde a um ficheiro válido
-		while (!isFileValid(file_toRead)) {
+		while (!isFileValid(in_file)) {
 			System.out.printf("\nPor favor introduza um nome de um ficheiro de texto valido (com extensao): ");
-			filename=ler.nextLine();
-			file_toRead= new File (filename);
+			in_file=getFile();
 		}
 
 		//Atribui o conteúdo do ficheiro à sequência
-		Scanner read_file=new Scanner(file_toRead);
-		int n=(int) file_toRead.length();
-		int numeros[]= new int [n];
+		int n=getFileSize(in_file);
 		
-		while(read_file.hasNextLine()) 
-			{
-			for (int i=0; i<n; i++) {
-				numeros[i]=file_toRead.nextLine();
-			}
-			}
-		
+		Scanner read_file=new Scanner(in_file);						
+		int numeros[]= new int [n];							//Cria uma array de dimensão n
+		int i=0; 											//Variável para contar quantos números inteiros estão no ficheiro
 
-		//Leitura dos N números da sequência
-		System.out.printf("Introduza os %d numeros da sua sequencia: ", n);
-
-		 
-		//Impressão dos N números pela ordem inversa
-		System.out.printf("\nSequencia introduza pela ordem inversa: ");
-		for (int j=(n-1); j>=0; j--) {
-			System.out.print(numeros[j]);
-			System.out.print(" ");
+		while(read_file.hasNextInt()){
+			numeros[i]=read_file.nextInt();
+			i++;
 		}
 
-	}
+		//Impressão dos N números pela ordem inversa no ficheiro resultados.txt
+		writeValues("resultados.txt", numeros, "\nSequencia introduzida pela ordem inversa: ", i);
 
-	public static int getInt (String message_in, String message_error, int lim)			//Obtenção do valor de N com validação
-	{
-		Scanner ler = new Scanner(System.in);
-		System.out.printf("%s",message_in);
-		int n=ler.nextInt();
-		while (n<=lim) 
-		{System.out.printf("%s", message_error);
-		n=ler.nextInt();}
-		return n;
 	}
 
 
-	//Função que devolve a validade do ficheiro 
+	//Função que pede ao utilizador o nome do ficheiro
+	public static File getFile() {
+		System.out.printf("Por favor introduza o nome do ficheiro de texto (com extensao): ");
+		String file_path=ler.nextLine();
+		File tmp= new File (file_path);
+		return tmp;
+	}
+
+	//Função booleana que devolve a validade do ficheiro 
 	public static boolean isFileValid (File file) {
 		if (!file.isFile()) {
 			System.out.printf("\nERROR : %s is not a file", file);
@@ -93,5 +89,30 @@ public class Ex9_2_a {
 		}
 		return true;
 	}
+	
+	//Função que devolve o tamanho do ficheiro (neste programa correspondente ao número máximo de números a serem lidos)
+	public static int getFileSize (File file) throws IOException {
+		int n=(int) file.length();
+		return n;
+	}
+	
+	//Função que imprime os valores da array values pela ordem inversa num ficheiro
+	public static void writeValues (String filename, int[] values, String message, int i) throws IOException {
+		//filename: Nome do ficheiro. É fornecido à função. 
+		//message: Texto inicial do ficheiro a ser gravado. É fornecido à função.  
+		
+		//Cria o ficheiro
+		File out_file = new File (filename); 			
+		PrintWriter out=new PrintWriter (out_file);
+		
+		//Imprime os valores da array values no ficheiro out_file
+		out.printf("%s",message);
+		for (int j=i-1; j>=0; j--) {
+			out.print(values[j]);
+			out.print(" ");
+		}
 
+		//Fecha o ficheiro
+		out.close();
+	}
 }
