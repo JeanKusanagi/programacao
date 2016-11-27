@@ -1,1 +1,5 @@
 /bin/
+/Guiao 9/tmp
+/.settings/
+.gitignore
+.checkstyle
