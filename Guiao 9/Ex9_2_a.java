@@ -60,7 +60,7 @@ public class Ex9_2_a {
 		}
 
 		//Impressão dos N números pela ordem inversa no ficheiro resultados.txt
-		writeValues("resultados.txt", numeros, "\nSequencia introduzida pela ordem inversa: ", i);
+		writeValues("resultados_9_2a.txt", numeros, "\nSequencia introduzida pela ordem inversa: ", i);
 
 	}
 

@@ -52,14 +52,14 @@ public class Ex9_2_b {
 		} 
 
 		//Contar o número de vezes que um determinado número, num_pretendido, aparece na sequência
-		System.out.printf("\nDos numeros introduzidos, indique de qual pretende saber a sua frequência absoluta (ie numero de vezes que apareceu): ");
+		System.out.printf("\nDos numeros introduzidos, indique de qual pretende saber a sua frequencia absoluta (ie numero de vezes que apareceu): ");
 		int num_pretendido=ler.nextInt();
 		for (int j=0; j<DIM; j++) {	
 			if (numeros[j]==num_pretendido) count_rep++;
 		}
 
 		//Impressão dos resultados no ficheiro resultados.txt
-		writeValues("resultados1.txt", count_rep, num_pretendido);
+		writeValues("resultados_9_2b.txt", count_rep, num_pretendido);
 
 	}
 
