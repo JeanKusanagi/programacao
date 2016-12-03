@@ -8,7 +8,7 @@
 //Importação de bibliotecas utilizadas
 import java.io.*;
 import java.util.Scanner;
-//import ddf.minim.*;
+import ddf.minim.*;
 
 //Parâmetros do labirinto
 int nCol, nLin;                                 // Nº de linhas e de colunas
@@ -16,7 +16,7 @@ int tamanho = 50;                               // Tamanho (largura e altura) da
 int espacamento = 2;                            // Espaço livre entre células
 float margemV, margemH;                         // Margem livre na vertical e na horizontal para assegurar que as células são quadrangulares
 color corObstaculos =  color(100, 0, 128);      // Cor de fundo dos obstáculos
-color ui=#FFF308;                               // Cor do texto e dos limites da janela
+color ui=#FFF308;                               // Cor do texto e dos limites dos menus
 
 //Parâmetros Pacman
 float px_pac, py_pac, pRaio;  //Posição
@@ -40,10 +40,12 @@ int win;
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 void setup() {
-  // Definir o tamanho da janela; notar que size() não aceita variáveis.
+  //Tamanho e título da janela
   size(720, 520);
   background(0);
+  frame.setTitle("Pacman | Maria João Lavoura | Pedro Teixeira");
 
+  //Número de linhas e de colunas
   nCol = (int)width/tamanho;
   nLin = (int)height/tamanho;
 
@@ -55,8 +57,8 @@ void setup() {
   margemH = (height - nLin * tamanho) / 2.0;
 
   //Posição Inicial do Pacman
-  px_pac = centroX(2);
-  py_pac = centroY(1);
+  px_pac = centroX(1);
+  py_pac = centroY(2);
   pRaio = (tamanho - espacamento) / 2;
 
   //Posição Inicial dos Fantasmas
@@ -64,9 +66,6 @@ void setup() {
   py_ghost = centroY(1);
 
   //Velocidades
-  //vx_pac = 0;
-  //vy_pac = 0;
-
   vx_ghost=0;
   vy_ghost=0;
 
@@ -168,8 +167,22 @@ void showMenu() {
 //-----------------------------------------------------------------------------------
 //Começa o jogo Single Player
 void startGame() {
-  startGameMultiplayer();
+  background(0);
+  desenharLabirinto();
+  desenharPontos();
+  desenharPacman(rotatePacmanStop(), rotatePacmanStart());
+  desenharFantasma(); 
   moveGhost();
+
+  //Impede que os fantasmas saiam dos limites do ecrã
+  if (px_ghost > centroX(nCol))
+    vx_ghost = -vx_ghost;
+  if (px_ghost < centroX(1))
+    vx_ghost = -vx_ghost;
+  
+  //Torna a velocidade funcional
+  px_ghost += vx_ghost;
+  py_ghost += vy_ghost;
 }
 //-----------------------------------------------------------------------------------
 //Começa o jogo multijogador
@@ -179,35 +192,19 @@ void startGameMultiplayer() {
   desenharPontos();
   desenharPacman(rotatePacmanStop(), rotatePacmanStart());
   desenharFantasma(); 
-
-  if (px_pac > centroX(nCol))
-    vx_pac = -vx_pac;
-  if (px_pac < centroX(1))
-    vx_pac = -vx_pac;
-  px_pac += vx_pac;
-  py_pac += vy_pac;
-
-  //Move aleatoriamente os fantasmas
-  if (px_ghost > centroX(nCol))
-    vx_ghost = -vx_ghost;
-  if (px_pac < centroX(1))
-    vx_ghost = -vx_ghost;
-  px_ghost += vx_ghost;
-  py_ghost += vy_ghost;
-  
 }
 //-----------------------------------------------------------------------------------
 //Função que termina o jogo mostrando uma mensagem e retornando ao menu
 void endGame(int winner) {
   //Termina o jogo
   setup();
-  
+
   //Texto "Game Over"
   PFont f=createFont("LithosPro-Black", 30, false); 
   textFont(f);
   fill(ui);
   text("Game Over", width/2, height/2-50);
-  
+
   //Indica quem ganhou
   if (winner==1) {	
     text("Jogador 1 foi eliminado", width/2, height/2+50);
@@ -216,15 +213,14 @@ void endGame(int winner) {
     text("Jogador 2 foi eliminado", width/2, height/2+50);
     //Print Pontuação para ficheiro
   }
-  
+
   //Mensagem para retornar ao menu
   textSize(15);
   text("Pressione uma tecla para voltar ao menu", width/2, height/2+100);
   textAlign(CENTER);
-  
+
   //Retorna ao menu;
   gamestate=0;
-  
 }
 
 //-----------------------------------------------------------------------------------
@@ -270,12 +266,12 @@ void showHelp() {
   textAlign(LEFT);
   text("ESC", (width/7)-50, 360);
   text("|  Voltar ao menu", (width/7)+50, 360);
-  
+
   //Opções
   textAlign(LEFT);
   text("C", (width/7)-50, 460);
   text("|  Definir cor do labirinto aleatoriamente", (width/7)+50, 460);
-  
+
   textSize(10);
   textAlign(CENTER);
   text("Autores: Maria João Lavoura | Pedro Veloso Teixeira", (width/2), 500);
@@ -299,17 +295,17 @@ void showScores() {
   PFont f=createFont("LithosPro-Black", 30, false); 
   textFont(f);
   fill(ui);
-  
+
   //Título
   textAlign(CENTER);
   text("Pontuações", width/2, 60);
-  
+
   //Subtítulos
   textAlign(LEFT);
   textSize(22);
   text("1 Jogador", (width/7), 110);
   text("2 Jogadores", 4*(width/7)+50, 110);
-  
+
   //Imprimir pontuações (score1[] para single player, score2[] para multiplayer)
   //for (int i=0; i<scores1.lenght; i++) {
   //  String score=scores1[i];
@@ -317,14 +313,14 @@ void showScores() {
   //  textAlign(LEFT);
   //  text(score, (width/7)+50, 160+40*i);
   //}
-    
+
   //for (int i=0; i<scores2.lenght; i++) {
   //  String score=scores2[i];
   //   textSize(18);
   //  textAlign(LEFT);
   //  text(score, (width/7)+50, 160+40*i);
   //}
-  
+
   //Fazer reset das pontuações : ainda não implementado
   textSize(18);
   textAlign(LEFT);
@@ -349,90 +345,116 @@ void desenharFantasma() {
 //-----------------------------------------------------------------------------------
 //Função que move aleatoriamente os fantasmas
 void moveGhost() {
-  vx_ghost=0;
-  vy_ghost=0;
+  
+  if (px_pac==px_ghost) {
+    if (py_pac<py_ghost) {
+      vx_ghost=0; 
+      vy_ghost=-2;
+    }
+    if (py_pac>py_ghost) {
+      vx_ghost=0; 
+      vy_ghost=2;
+    }
+  }
+  if (py_pac==py_ghost) {
+    if (px_pac<px_ghost) {
+      vy_ghost=0; 
+      vx_ghost=-2;
+    }
+    if (px_pac>px_ghost) {
+      vy_ghost=0; 
+      vx_ghost=2;
+    }
+  } 
+
+  if ((px_pac==px_ghost) && (py_pac==py_ghost)) 
+    detectedColision=1;
+  else {
+    detectedColision=0;
+  }
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função chamada quando existe input do teclado
 void keyPressed() {
 
-  //Move o Fantasma (WASD)
-  //Left A Key
-  if ( key == 'a' || key == 'A' ) {
-    PImage ghost_left;
-    ghost_left=loadImage("ghost_left.png");
-    image(ghost_left, px_ghost, py_ghost, 30, 30);
+  //Move o Fantasma (WASD) 
+  if (gamestate==2) {      //Garante que só é possivel controlar o fantasma no modo Multijogador
+    //Left A Key
+    if ( key == 'a' || key == 'A' ) {
+      PImage ghost_left;
+      ghost_left=loadImage("ghost_left.png");
+      image(ghost_left, px_ghost, py_ghost, 30, 30);
 
-    float cx = px_ghost-50;                //Para a célula ao lado esquerdo da actual
-    float cy = py_ghost;                   //...da mesma linha
-    color c = get((int)cx, (int)cy);       //Obtém a cor dessa célula
-    if (c != corObstaculos) {              //Se essa célula não for obstáculo
-      px_ghost = px_ghost - 50;            //Move o fantasma
+      float cx = px_ghost-50;                //Para a célula ao lado esquerdo da actual
+      float cy = py_ghost;                   //...da mesma linha
+      color c = get((int)cx, (int)cy);       //Obtém a cor dessa célula
+      if (c != corObstaculos) {              //Se essa célula não for obstáculo
+        px_ghost = px_ghost - 50;            //Move o fantasma
+      }
+
+      if (px_ghost < centroX(1)) {           //impede Fantasma sair da janela
+        px_ghost = px_ghost + 50;
+      }
     }
 
-    if (px_ghost < centroX(1)) {           //impede Fantasma sair da janela
-      px_ghost = px_ghost + 50;
+    //----------------------------------------------
+    //Right D Key
+    if ( key == 'd' || key == 'D' ) {
+      PImage ghost_right;
+      ghost_right=loadImage("ghost_right.png");
+      image(ghost_right, px_ghost, py_ghost, 30, 30);
+
+      float cx = px_ghost+50;
+      float cy = py_ghost;
+
+      color c = get((int)cx, (int)cy);
+
+      if (c != corObstaculos) {
+        px_ghost = px_ghost + 50;
+      }
+
+      if (px_ghost > centroX(nCol)) { 
+        px_ghost = px_ghost - 50;
+      }
+    }
+
+    //----------------------------------------------
+    //Up W Key
+    if ( key == 'w' || key == 'W' ) {
+      float cx = px_ghost;
+      float cy = py_ghost-50;
+      color c = get((int)cx, (int)cy);
+
+      if (c != corObstaculos) {
+        py_ghost = py_ghost - 50;
+      }
+
+      if (py_ghost < centroY(1)) { 
+        py_ghost = py_ghost + 50;
+      }
+    }
+
+    //----------------------------------------------
+    //Down S Key
+    if ( key == 's' || key == 'S' ) {
+      PImage ghost_down;
+      ghost_down=loadImage("ghost_down.png");
+      image(ghost_down, px_ghost, py_ghost, 30, 30);
+
+      float cx=px_ghost;
+      float cy=py_ghost+50;
+      color c = get((int)cx, (int)cy);
+
+      if (c != corObstaculos) {
+        py_ghost = py_ghost + 50;
+      }
+
+      if (py_ghost > centroY(nLin)) { 
+        py_ghost = py_ghost - 50;
+      }
     }
   }
-
-  //----------------------------------------------
-  //Right D Key
-  if ( key == 'd' || key == 'D' ) {
-    PImage ghost_right;
-    ghost_right=loadImage("ghost_right.png");
-    image(ghost_right, px_ghost, py_ghost, 30, 30);
-
-    float cx = px_ghost+50;
-    float cy = py_ghost;
-
-    color c = get((int)cx, (int)cy);
-
-    if (c != corObstaculos) {
-      px_ghost = px_ghost + 50;
-    }
-
-    if (px_ghost > centroX(nCol)) { 
-      px_ghost = px_ghost - 50;
-    }
-  }
-
-  //----------------------------------------------
-  //Up W Key
-  if ( key == 'w' || key == 'W' ) {
-    float cx = px_ghost;
-    float cy = py_ghost-50;
-    color c = get((int)cx, (int)cy);
-
-    if (c != corObstaculos) {
-      py_ghost = py_ghost - 50;
-    }
-
-    if (py_ghost < centroY(1)) { 
-      py_ghost = py_ghost + 50;
-    }
-  }
-
-  //----------------------------------------------
-  //Down S Key
-  if ( key == 's' || key == 'S' ) {
-    PImage ghost_down;
-    ghost_down=loadImage("ghost_down.png");
-    image(ghost_down, px_ghost, py_ghost, 30, 30);
-
-    float cx=px_ghost;
-    float cy=py_ghost+50;
-    color c = get((int)cx, (int)cy);
-
-    if (c != corObstaculos) {
-      py_ghost = py_ghost + 50;
-    }
-
-    if (py_ghost > centroY(nLin)) { 
-      py_ghost = py_ghost - 50;
-    }
-  }
-
   //------------------------------------------------------------------------------------------------------------ 
   //Move o Pacman (arrow keys) 
 
@@ -537,19 +559,19 @@ void keyPressed() {
     key=0;
     setup();
   }
-  
+
   //Aleatoriza a cor dos obstáculos
   if (key == 'c' || key == 'C') {
     do {
       corObstaculos=color(random(255), random(255), random(40, 255));     //random(40,255) impede um Brightness menor que 40, impedido cores demasiado claras
     } while (corObstaculos==#000000);  //Impede que a cor do obstáculo seja preto
   }
-  
+
   //Desliga/Liga o Som
   if (key == 'm' || key == 'M') {
-    //mute(); 
+    //mute();
   }
-  
+
   //Reincia as pontuações
 }
 
@@ -599,13 +621,13 @@ float rotatePacmanStart() {
 //Função que desenha o labirinto
 void desenharLabirinto () {
 
-  // desenha a fronteira da área de jogo
+  //Desenha a fronteira da área de jogo
   fill(0);
-  stroke(corObstaculos );
+  stroke(corObstaculos);
   strokeWeight(espacamento);
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
-  // Desenha obstáculos
+  //Desenha obstáculos
   desenharObstaculo(3, 2, 1, 2); // P
   desenharObstaculo(2, 2, 1, 4); // P
   desenharObstaculo(5, 2, 3, 1);
@@ -680,47 +702,45 @@ float centroY(int lin) {
 //Funções para Pontuações -- ainda não testadas nem verificadas
 //Função que obtém pontuações de um ficheiro
 int[] ReadScores_File () throws IOException {  
-    File file= new File ("scores.txt");
-    
-    Scanner in = new Scanner (file);
-    int scores[] = new int[(int) file.length()];
-    int i=0;
-    
-    while(in.hasNextInt()){
-      String s = in.next();
-      if (!in.hasNext()) break;
-      scores[i] = Integer.parseInt(s);
-      i++;
-    }
-    
-    in.close();
-    return scores;
- 
+  File file= new File ("scores.txt");
+
+  Scanner in = new Scanner (file);
+  int scores[] = new int[(int) file.length()];
+  int i=0;
+
+  while (in.hasNextInt()) {
+    String s = in.next();
+    if (!in.hasNext()) break;
+    scores[i] = Integer.parseInt(s);
+    i++;
   }
-  
-  
-  //Função que imprime as pontuações num ficheiro
+
+  in.close();
+  return scores;
+}
+
+
+//Função que imprime as pontuações num ficheiro
 void PrintScores_File (int[] scores, int[] scores2) throws IOException {
-    //Single Player Mode
-    File file = new File ("scores_singleplayer.txt");       
-    PrintWriter out=new PrintWriter (new FileWriter(file));  //FileWriter impede que o texto anterior seja apagado.
+  //Single Player Mode
+  File file = new File ("scores_singleplayer.txt");       
+  PrintWriter out=new PrintWriter (new FileWriter(file));  //FileWriter impede que o texto anterior seja apagado.
 
-    for (int i=0; i<scores.length; i++) {
-      int num=scores[i];
-      out.print(num);
-      out.print(" ");
-    }
-    out.close();
-    
-    //Multiplayer Mode
-    File file2 = new File ("scores_multiplayer.txt");       
-    PrintWriter out2=new PrintWriter (new FileWriter(file2));  //FileWriter impede que o texto anterior seja apagado.
-
-    for (int j=0; j<scores.length; j++) {
-      int num=scores2[j];
-      out2.print(num);
-      out2.print(" ");
-    }
-    out2.close();
-    
+  for (int i=0; i<scores.length; i++) {
+    int num=scores[i];
+    out.print(num);
+    out.print(" ");
   }
+  out.close();
+
+  //Multiplayer Mode
+  File file2 = new File ("scores_multiplayer.txt");       
+  PrintWriter out2=new PrintWriter (new FileWriter(file2));  //FileWriter impede que o texto anterior seja apagado.
+
+  for (int j=0; j<scores.length; j++) {
+    int num=scores2[j];
+    out2.print(num);
+    out2.print(" ");
+  }
+  out2.close();
+}
