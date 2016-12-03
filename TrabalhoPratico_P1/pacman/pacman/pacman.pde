@@ -8,7 +8,7 @@
 //Importação de bibliotecas utilizadas
 import java.io.*;
 import java.util.Scanner;
-import ddf.minim.*;
+//import ddf.minim.*;
 
 //Parâmetros do labirinto
 int nCol, nLin;                                 // Nº de linhas e de colunas
@@ -19,12 +19,15 @@ color corObstaculos =  color(100, 0, 128);      // Cor de fundo dos obstáculos
 color ui=#FFF308;                               // Cor do texto e dos limites dos menus
 
 //Parâmetros Pacman
-float px_pac, py_pac, pRaio;  //Posição
-float vx_pac, vy_pac;         //Velocidade
+float px_pac, py_pac, pRaio;        //Posição
+float vx_pac, vy_pac;               //Velocidade
 
 //Parâmetros dos fantasmas
-float px_ghost, py_ghost;     //Posição
-float vx_ghost, vy_ghost;     //Velocidade
+float px_ghost, py_ghost;           //Posição
+float vx_ghost, vy_ghost;           //Velocidade
+float set_vx_ghost, set_vy_ghost; 
+PImage[] red_ghost= new PImage[4];  //Imagens
+int red_ghost_img; 
 
 //Estado do jogo (0=Menu, 1=Single Player, 2=Multiplayer, 3=Scores, 4=Help)
 int gamestate, old_gamestate; 
@@ -43,7 +46,7 @@ void setup() {
   //Tamanho e título da janela
   size(720, 520);
   background(0);
-  frame.setTitle("Pacman | Maria João Lavoura | Pedro Teixeira");
+  surface.setTitle("Pacman | Maria João Lavoura | Pedro Teixeira");
 
   //Número de linhas e de colunas
   nCol = (int)width/tamanho;
@@ -56,19 +59,23 @@ void setup() {
   margemV = (width - nCol * tamanho) / 2.0;
   margemH = (height - nLin * tamanho) / 2.0;
 
-  //Posição Inicial do Pacman
+  //Inicalização da posição inicial do Pacman
   px_pac = centroX(1);
   py_pac = centroY(2);
   pRaio = (tamanho - espacamento) / 2;
 
-  //Posição Inicial dos Fantasmas
-  px_ghost = centroX(13);
+  //Inicalização dos parâmetros dos fantasmas
+  px_ghost = centroX(13);      //Posições iniciais
   py_ghost = centroY(1);
-
-  //Velocidades
-  vx_ghost=0;
+  vx_ghost=0;                  //Velocidades inicias
   vy_ghost=0;
+  //Imagens
+  red_ghost[0]=loadImage("ghost.png");
+  red_ghost[1]= loadImage("ghost_up.png");
+  red_ghost[2]=loadImage("ghost_left.png");
+  red_ghost[3]= loadImage("ghost_right.png");
 
+  //Começa o jogo no menu
   gamestate=0;
 }
 
@@ -171,16 +178,29 @@ void startGame() {
   desenharLabirinto();
   desenharPontos();
   desenharPacman(rotatePacmanStop(), rotatePacmanStart());
-  desenharFantasma(); 
+
+  //Consoante a velocidade, desenha o fantasma correspondente
+  int i=0;
+  if (vx_ghost<0) i=2;  
+  if (vx_ghost>0) i=3;
+  if (vy_ghost<0) i=1;
+  desenharFantasma(i); 
   moveGhost();
+
+  set_vx_ghost=2;
+  set_vy_ghost=2; 
 
   //Impede que os fantasmas saiam dos limites do ecrã
   if (px_ghost > centroX(nCol))
     vx_ghost = -vx_ghost;
   if (px_ghost < centroX(1))
     vx_ghost = -vx_ghost;
-  
-  //Torna a velocidade funcional
+  if (py_ghost > centroY(nLin))
+    vy_ghost = -vy_ghost;
+  if (py_ghost < centroY(1))
+    vy_ghost = -vy_ghost; 
+
+  //Implementa a velocidade
   px_ghost += vx_ghost;
   py_ghost += vy_ghost;
 }
@@ -191,7 +211,18 @@ void startGameMultiplayer() {
   desenharLabirinto();
   desenharPontos();
   desenharPacman(rotatePacmanStop(), rotatePacmanStart());
-  desenharFantasma(); 
+  
+  //Desenha o fantasma inicial
+  desenharFantasma(0);
+
+  //Consoante a tecla pressionada, desenha o fantasma correspondente
+  if (keyPressed) {
+    if ( key == 'a' || key == 'A' )  red_ghost_img=2;
+    if ( key == 'd' || key == 'D' )  red_ghost_img=3;
+    if ( key == 'w' || key == 'W' )  red_ghost_img=1;
+    if ( key == 's' || key == 'S' )  red_ghost_img=0;
+  } else if (!keyPressed) desenharFantasma(red_ghost_img);
+
 }
 //-----------------------------------------------------------------------------------
 //Função que termina o jogo mostrando uma mensagem e retornando ao menu
@@ -277,7 +308,7 @@ void showHelp() {
   text("Autores: Maria João Lavoura | Pedro Veloso Teixeira", (width/2), 500);
 
   /* Texto: setas direcionais
-   * necessário utilizar outra fonte pois LithosPro-Black não possui estes caracteres) */
+   	 * necessário utilizar outra fonte pois LithosPro-Black não possui estes caracteres) */
   PFont f1=createFont("Arial", 30, false); 
   textFont(f1);
   textSize(19);
@@ -335,35 +366,33 @@ void desenharPacman(float start, float stop) {
 
 //-----------------------------------------------------------------------------------
 //Função que desenha os fantasmas
-void desenharFantasma() {
-  PImage ghost;
-  ghost=loadImage("ghost.png");
+void desenharFantasma(int i) {
   imageMode(CENTER);
-  image(ghost, px_ghost, py_ghost, 30, 30);
+  image(red_ghost[i], px_ghost, py_ghost, 30, 30);
 }
 
 //-----------------------------------------------------------------------------------
 //Função que move aleatoriamente os fantasmas
 void moveGhost() {
-  
+
   if (px_pac==px_ghost) {
     if (py_pac<py_ghost) {
       vx_ghost=0; 
-      vy_ghost=-2;
+      vy_ghost=-set_vy_ghost;
     }
     if (py_pac>py_ghost) {
       vx_ghost=0; 
-      vy_ghost=2;
+      vy_ghost=set_vy_ghost;
     }
   }
   if (py_pac==py_ghost) {
     if (px_pac<px_ghost) {
-      vy_ghost=0; 
-      vx_ghost=-2;
+      vx_ghost=-set_vx_ghost;
+      vy_ghost=0;
     }
     if (px_pac>px_ghost) {
-      vy_ghost=0; 
-      vx_ghost=2;
+      vx_ghost=set_vx_ghost;
+      vy_ghost=0;
     }
   } 
 
@@ -381,19 +410,17 @@ void keyPressed() {
   //Move o Fantasma (WASD) 
   if (gamestate==2) {      //Garante que só é possivel controlar o fantasma no modo Multijogador
     //Left A Key
-    if ( key == 'a' || key == 'A' ) {
-      PImage ghost_left;
-      ghost_left=loadImage("ghost_left.png");
-      image(ghost_left, px_ghost, py_ghost, 30, 30);
-
+    if ( key == 'a' || key == 'A' ) {      
       float cx = px_ghost-50;                //Para a célula ao lado esquerdo da actual
       float cy = py_ghost;                   //...da mesma linha
       color c = get((int)cx, (int)cy);       //Obtém a cor dessa célula
+
       if (c != corObstaculos) {              //Se essa célula não for obstáculo
         px_ghost = px_ghost - 50;            //Move o fantasma
       }
 
-      if (px_ghost < centroX(1)) {           //impede Fantasma sair da janela
+      //Impede o fantasma de sair da janela
+      if (px_ghost < centroX(1)) {           
         px_ghost = px_ghost + 50;
       }
     }
@@ -401,13 +428,8 @@ void keyPressed() {
     //----------------------------------------------
     //Right D Key
     if ( key == 'd' || key == 'D' ) {
-      PImage ghost_right;
-      ghost_right=loadImage("ghost_right.png");
-      image(ghost_right, px_ghost, py_ghost, 30, 30);
-
       float cx = px_ghost+50;
       float cy = py_ghost;
-
       color c = get((int)cx, (int)cy);
 
       if (c != corObstaculos) {
@@ -438,10 +460,6 @@ void keyPressed() {
     //----------------------------------------------
     //Down S Key
     if ( key == 's' || key == 'S' ) {
-      PImage ghost_down;
-      ghost_down=loadImage("ghost_down.png");
-      image(ghost_down, px_ghost, py_ghost, 30, 30);
-
       float cx=px_ghost;
       float cy=py_ghost+50;
       color c = get((int)cx, (int)cy);
@@ -637,11 +655,11 @@ void desenharLabirinto () {
   //desenharObstaculo(5, 4, nCol-4, nLin-4);
 
   /* Desenha um obstáculo interno de um labirinto:
-   x: índice da célula inicial segundo eixo dos X - gama (1..nCol) 
-   y: índice da célula inicial segundo eixo dos Y - gama (1..nLin)
-   numC: nº de colunas (células) segundo eixo dos X (largura do obstáculo)
-   numL: nº de linhas (células) segundo eixo dos Y (altura do obstáculo) 
-   	 */
+   * x: índice da célula inicial segundo eixo dos X - gama (1..nCol) 
+   * y: índice da célula inicial segundo eixo dos Y - gama (1..nLin)
+   * numC: nº de colunas (células) segundo eixo dos X (largura do obstáculo)
+   * numL: nº de linhas (células) segundo eixo dos Y (altura do obstáculo) 
+   */
 }
 
 //-----------------------------------------------------------------------------------
@@ -661,8 +679,8 @@ void desenharObstaculo(int x, int y, int numC, int numL) {
 }
 
 /* Desenhar pontos nas células vazias (que não fazem parte de um obstáculo). 
- * Esta função usa a cor de fundo no ecrã para determinar se uma célula está vazia ou se faz parte de um obstáculo.
- */
+ 	 * Esta função usa a cor de fundo no ecrã para determinar se uma célula está vazia ou se faz parte de um obstáculo.
+ 	 */
 
 //-----------------------------------------------------------------------------------
 //Função que desenha pontos
@@ -681,7 +699,7 @@ void desenharPontos() {
       color c = get((int)cx, (int)cy);
       if (c != corObstaculos) {
         fill(255);
-        ellipse(cx, cy, pRaio/2, pRaio/2);
+        ellipse(cx, cy, pRaio/3, pRaio/3);
       }
     }
 }
