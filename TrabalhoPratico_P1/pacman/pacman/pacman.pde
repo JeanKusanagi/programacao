@@ -43,11 +43,13 @@ int win;
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 void setup() {
-  //Tamanho e título da janela
+  //Tamanho, título e ícone da janela
   size(720, 520);
   background(0);
   surface.setTitle("Pacman | Maria João Lavoura | Pedro Teixeira");
-
+  PImage icon = loadImage("data\\icon.png");
+  surface.setIcon(icon);
+  
   //Número de linhas e de colunas
   nCol = (int)width/tamanho;
   nLin = (int)height/tamanho;
@@ -69,11 +71,12 @@ void setup() {
   py_ghost = centroY(1);
   vx_ghost=0;                  //Velocidades inicias
   vy_ghost=0;
+
   //Imagens
-  red_ghost[0]=loadImage("ghost.png");
-  red_ghost[1]= loadImage("ghost_up.png");
-  red_ghost[2]=loadImage("ghost_left.png");
-  red_ghost[3]= loadImage("ghost_right.png");
+  red_ghost[0]=loadImage("data\\ghost.png");
+  red_ghost[1]= loadImage("data\\ghost_up.png");
+  red_ghost[2]=loadImage("data\\ghost_left.png");
+  red_ghost[3]= loadImage("data\\ghost_right.png");
 
   //Começa o jogo no menu
   gamestate=0;
@@ -131,7 +134,7 @@ void draw() {
 void showMenu() {
   //Fundo e limite
   PImage background;
-  background = loadImage("background.jpg");
+  background = loadImage("data\\background.jpg");
   background(background);
 
   fill(0, 0);
@@ -211,7 +214,7 @@ void startGameMultiplayer() {
   desenharLabirinto();
   desenharPontos();
   desenharPacman(rotatePacmanStop(), rotatePacmanStart());
-  
+
   //Desenha o fantasma inicial
   desenharFantasma(0);
 
@@ -222,7 +225,6 @@ void startGameMultiplayer() {
     if ( key == 'w' || key == 'W' )  red_ghost_img=1;
     if ( key == 's' || key == 'S' )  red_ghost_img=0;
   } else if (!keyPressed) desenharFantasma(red_ghost_img);
-
 }
 //-----------------------------------------------------------------------------------
 //Função que termina o jogo mostrando uma mensagem e retornando ao menu
@@ -372,7 +374,7 @@ void desenharFantasma(int i) {
 }
 
 //-----------------------------------------------------------------------------------
-//Função que move aleatoriamente os fantasmas
+//Função que move o fantasma (persegue o Pacman)
 void moveGhost() {
 
   if (px_pac==px_ghost) {
@@ -395,6 +397,23 @@ void moveGhost() {
       vy_ghost=0;
     }
   } 
+  
+  if (py_pac<py_ghost) {
+    vx_ghost=0; 
+    vy_ghost=-set_vy_ghost;
+  }
+  if (py_pac>py_ghost) {
+    vx_ghost=0; 
+    vy_ghost=set_vy_ghost;
+  }
+  if (px_pac<px_ghost) {
+    vx_ghost=-set_vx_ghost; 
+    vy_ghost=0;
+  }
+  if (px_pac>px_ghost) {
+    vx_ghost=set_vx_ghost; 
+    vy_ghost=0;
+  }
 
   if ((px_pac==px_ghost) && (py_pac==py_ghost)) 
     detectedColision=1;
