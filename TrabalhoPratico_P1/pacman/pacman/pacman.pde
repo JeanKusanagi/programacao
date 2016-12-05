@@ -1,4 +1,4 @@
-/* Maria João Lavoura
+/* Maria João Lavoura //<>//
  * Pedro Teixeira
  *
  * Programação I | Trabalho Prático
@@ -8,7 +8,7 @@
 //Importação de bibliotecas utilizadas
 import java.io.*;
 import java.util.Scanner;
-//import ddf.minim.*;
+import ddf.minim.*;
 
 //Parâmetros do labirinto
 int nCol, nLin;                                 // Nº de linhas e de colunas
@@ -17,6 +17,7 @@ int espacamento = 2;                            // Espaço livre entre células
 float margemV, margemH;                         // Margem livre na vertical e na horizontal para assegurar que as células são quadrangulares
 color corObstaculos =  color(100, 0, 128);      // Cor de fundo dos obstáculos
 color ui=#FFF308;                               // Cor do texto e dos limites dos menus
+String font="data\\LithosPro-Black.otf";        // Fonte da UI
 
 //Parâmetros Pacman
 float px_pac, py_pac, pRaio;        //Posição
@@ -29,7 +30,7 @@ float set_vx_ghost, set_vy_ghost;
 PImage[] red_ghost= new PImage[4];  //Imagens
 int red_ghost_img; 
 
-//Estado do jogo (0=Menu, 1=Single Player, 2=Multiplayer, 3=Scores, 4=Help)
+//Estado do jogo (0=Menu, 1=Single Player, 2=Multiplayer, 3=Pontuações, 4=Ajuda)
 int gamestate, old_gamestate; 
 
 //Detectada colisão? (1=Sim, 2=Não)
@@ -38,8 +39,9 @@ int detectedColision;
 //Vencedor (1=Pacman, 2=Fantasma)
 int win;
 
-//Som
-
+//Som (1: Som de Início, 2: Som de Fim de Jogo, 3: Som Comer Ponto)
+Minim minim;
+AudioPlayer sound[]=new AudioPlayer[3]; 
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 void setup() {
@@ -49,7 +51,7 @@ void setup() {
   surface.setTitle("Pacman | Maria João Lavoura | Pedro Teixeira");
   PImage icon = loadImage("data\\icon.png");
   surface.setIcon(icon);
-  
+
   //Número de linhas e de colunas
   nCol = (int)width/tamanho;
   nLin = (int)height/tamanho;
@@ -72,18 +74,26 @@ void setup() {
   vx_ghost=0;                  //Velocidades inicias
   vy_ghost=0;
 
-  //Imagens
+  //Inicialização das imagens
   red_ghost[0]=loadImage("data\\ghost.png");
   red_ghost[1]= loadImage("data\\ghost_up.png");
   red_ghost[2]=loadImage("data\\ghost_left.png");
   red_ghost[3]= loadImage("data\\ghost_right.png");
 
-  //Começa o jogo no menu
+  //Inicializar os sons
+  minim = new Minim(this);
+  sound[0]=minim.loadFile("start.mp3"); 
+  sound[1]=minim.loadFile("gameover.mp3");
+  sound[2]=minim.loadFile("eatpoint.mp3");
+
+  //Som de Início
+  if (gamestate!=5) sound[0].play(0);
   gamestate=0;
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 void draw() {
+
   switch (gamestate) {
 
   case 0:   //Mostra as opções
@@ -113,13 +123,14 @@ void draw() {
 
   case 5:   //Termina o jogo
     background(0);
+    gameoverSound();
     endGame(win);
     break;
   }
 
   //Detecta quando o Pacman ganha (obtêm a pontuação máxima)
   //if () {
-  //  gamestate=5;
+  //gamestate=5;
   //  win=1;
   //}
 
@@ -143,7 +154,7 @@ void showMenu() {
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
   //Texto
-  PFont f=createFont("LithosPro-Black", 30, false); 
+  PFont f=createFont(font, 30, false); 
   textFont(f);
   fill(ui);
 
@@ -173,7 +184,6 @@ void showMenu() {
     break;
   }
 }
-
 //-----------------------------------------------------------------------------------
 //Começa o jogo Single Player
 void startGame() {
@@ -230,10 +240,18 @@ void startGameMultiplayer() {
 //Função que termina o jogo mostrando uma mensagem e retornando ao menu
 void endGame(int winner) {
   //Termina o jogo
+ delay(2000);
+ sound[1].close();
   setup();
 
+  //Limite
+  fill(0, 0);
+  stroke(ui);
+  strokeWeight(espacamento);
+  rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
+
   //Texto "Game Over"
-  PFont f=createFont("LithosPro-Black", 30, false); 
+  PFont f=createFont(font, 30, false); 
   textFont(f);
   fill(ui);
   text("Game Over", width/2, height/2-50);
@@ -249,7 +267,7 @@ void endGame(int winner) {
 
   //Mensagem para retornar ao menu
   textSize(15);
-  text("Pressione uma tecla para voltar ao menu", width/2, height/2+100);
+  text("Pressione ESC para voltar", width/2, height/2+100);
   textAlign(CENTER);
 
   //Retorna ao menu;
@@ -264,7 +282,7 @@ void showHelp() {
   strokeWeight(espacamento);
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
-  PFont f=createFont("LithosPro-Black", 30, false); 
+  PFont f=createFont(font, 30, false); 
   textFont(f);
   fill(#FFF308);
 
@@ -310,7 +328,7 @@ void showHelp() {
   text("Autores: Maria João Lavoura | Pedro Veloso Teixeira", (width/2), 500);
 
   /* Texto: setas direcionais
-   	 * necessário utilizar outra fonte pois LithosPro-Black não possui estes caracteres) */
+   * necessário utilizar outra fonte pois LithosPro-Black não possui estes caracteres) */
   PFont f1=createFont("Arial", 30, false); 
   textFont(f1);
   textSize(19);
@@ -325,7 +343,7 @@ void showScores() {
   strokeWeight(espacamento);
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
-  PFont f=createFont("LithosPro-Black", 30, false); 
+  PFont f=createFont(font, 30, false); 
   textFont(f);
   fill(ui);
 
@@ -359,6 +377,15 @@ void showScores() {
   textAlign(LEFT);
   text("R | Reinciar as pontuações", (width/7)-50, 460);
 }
+//-----------------------------------------------------------------------------------
+//Função que executa o som de fim de jogo
+void gameoverSound() {
+  sound[0].close(); 
+  sound[2].close();
+  noLoop();
+  sound[1].play();
+}
+
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que desenha o Pacman
 void desenharPacman(float start, float stop) {
@@ -372,7 +399,6 @@ void desenharFantasma(int i) {
   imageMode(CENTER);
   image(red_ghost[i], px_ghost, py_ghost, 30, 30);
 }
-
 //-----------------------------------------------------------------------------------
 //Função que move o fantasma (persegue o Pacman)
 void moveGhost() {
@@ -391,13 +417,31 @@ void moveGhost() {
     if (px_pac<px_ghost) {
       vx_ghost=-set_vx_ghost;
       vy_ghost=0;
+
+      float cx = px_ghost-50;                
+      float cy = py_ghost;                   
+      color c = get((int)cx, (int)cy);       
+
+      if (c == corObstaculos) {              
+        vx_ghost=0;
+        px_ghost=(int)(px_ghost);
+      }
     }
     if (px_pac>px_ghost) {
       vx_ghost=set_vx_ghost;
       vy_ghost=0;
+
+      float cx = px_ghost+50;                
+      float cy = py_ghost;                   
+      color c = get((int)cx, (int)cy);      
+
+      if (c == corObstaculos) {              
+        vx_ghost=0;    
+        px_ghost=(int)(px_ghost);
+      }
     }
   } 
-  
+
   if (py_pac<py_ghost) {
     vx_ghost=0; 
     vy_ghost=-set_vy_ghost;
@@ -409,10 +453,27 @@ void moveGhost() {
   if (px_pac<px_ghost) {
     vx_ghost=-set_vx_ghost; 
     vy_ghost=0;
+    float cx = px_ghost-50;                
+    float cy = py_ghost;                   
+    color c = get((int)cx, (int)cy);       
+
+    if (c == corObstaculos) {              
+      vx_ghost=0;
+      px_ghost=(int)(px_ghost);
+    }
   }
   if (px_pac>px_ghost) {
     vx_ghost=set_vx_ghost; 
     vy_ghost=0;
+
+    float cx = px_ghost+50;                
+    float cy = py_ghost;                   
+    color c = get((int)cx, (int)cy);      
+
+    if (c == corObstaculos) {              
+      vx_ghost=0;    
+      px_ghost=(int)(px_ghost);
+    }
   }
 
   if ((px_pac==px_ghost) && (py_pac==py_ghost)) 
@@ -500,7 +561,7 @@ void keyPressed() {
     float cx = px_pac-50;              //Para a célula ao lado esquerdo da actual
     float cy = py_pac;                 //...da mesma linha
     color c = get((int)cx, (int)cy);   //Obtém a cor dessa célula
-
+    sound[2].play(0);
     if (c != corObstaculos) {          //Se essa célula não for obstáculo
       px_pac = px_pac - 50;            //Move o Pacman
     }
@@ -556,16 +617,16 @@ void keyPressed() {
   }
   //------------------------------------------------------------------------------------------------------------ 
   //Detecta colisões
-  if ((px_pac==px_ghost) && (py_pac==py_ghost)) 
+  if ((px_pac==px_ghost) && (py_pac==py_ghost)) { 
     detectedColision=1;
-  else {
+  } else {
     detectedColision=0;
   } 
 
   //------------------------------------------------------------------------------------------------------------ 
   //Interacção com o utilizador
   //Pausa o jogo
-  PFont f=createFont("LithosPro-Black", 30, false);
+  PFont f=createFont(font, 30, false);
   textFont(f);
   fill(ui);
 
@@ -594,6 +655,11 @@ void keyPressed() {
   //Reincia o jogo/retorna ao menu 
   if (key == ESC) {
     key=0;
+    sound[0].close();		//Garante que quando o jogo sai de um estado Game Over, não são repetidos sons 
+    sound[1].close();
+    sound[2].close();
+    setup();				//E que o ecrã é actualizado
+    loop();
     setup();
   }
 
@@ -606,9 +672,11 @@ void keyPressed() {
 
   //Desliga/Liga o Som
   if (key == 'm' || key == 'M') {
-    //mute();
+    for (int i=0; i<3; i++) {
+      if (sound[i].isMuted()==true) sound[i].unmute();
+      if (sound[i].isMuted()==false) sound[i].mute();
+    }
   }
-
   //Reincia as pontuações
 }
 
