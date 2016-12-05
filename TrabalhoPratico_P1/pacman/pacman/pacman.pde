@@ -12,7 +12,7 @@ import ddf.minim.*;
 
 //Parâmetros do labirinto
 int nCol, nLin;                                 // Nº de linhas e de colunas
-int tamanho = 50;                               // Tamanho (largura e altura) das células do labirinto  
+int tamanho = 50;                               // Tamanho (largura e altura) das células do labirinto
 int espacamento = 2;                            // Espaço livre entre células
 float margemV, margemH;                         // Margem livre na vertical e na horizontal para assegurar que as células são quadrangulares
 color corObstaculos =  color(100, 0, 128);      // Cor de fundo dos obstáculos
@@ -26,12 +26,15 @@ float vx_pac, vy_pac;               //Velocidade
 //Parâmetros dos fantasmas
 float px_ghost, py_ghost;           //Posição
 float vx_ghost, vy_ghost;           //Velocidade
-float set_vx_ghost, set_vy_ghost; 
+float set_vx_ghost, set_vy_ghost;
 PImage[] red_ghost= new PImage[4];  //Imagens
-int red_ghost_img; 
+int red_ghost_img;
 
 //Estado do jogo (0=Menu, 1=Single Player, 2=Multiplayer, 3=Pontuações, 4=Ajuda)
-int gamestate, old_gamestate; 
+int gamestate, old_gamestate;
+
+//Estado do jogo (novo jogo)
+//boolean justStarted = true; // REVIEW
 
 //Detectada colisão? (1=Sim, 2=Não)
 int detectedColision;
@@ -41,7 +44,11 @@ int win;
 
 //Som (1: Som de Início, 2: Som de Fim de Jogo, 3: Som Comer Ponto)
 Minim minim;
-AudioPlayer sound[]=new AudioPlayer[3]; 
+AudioPlayer sound[]=new AudioPlayer[3];
+boolean soundEnabled;
+
+//array bolas=comida
+float comida[][];
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 void setup() {
@@ -56,10 +63,10 @@ void setup() {
   nCol = (int)width/tamanho;
   nLin = (int)height/tamanho;
 
-  //Assegurar que nº de linhas e nº de colunas é maior ou igual a 3
+  //Assegurar que nº de linhas e nº de colunas é maior ou igual a 5
   assert nCol >= 5 && nLin >= 5;
 
-  //Determinar margens para limitar a área útil do jogo 
+  //Determinar margens para limitar a área útil do jogo
   margemV = (width - nCol * tamanho) / 2.0;
   margemH = (height - nLin * tamanho) / 2.0;
 
@@ -82,13 +89,19 @@ void setup() {
 
   //Inicializar os sons
   minim = new Minim(this);
-  sound[0]=minim.loadFile("start.mp3"); 
+  sound[0]=minim.loadFile("start.mp3");
   sound[1]=minim.loadFile("gameover.mp3");
   sound[2]=minim.loadFile("eatpoint.mp3");
+  soundEnabled=true;
 
   //Som de Início
-  if (gamestate!=5) sound[0].play(0);
+  if (soundEnabled=true && gamestate!=5) sound[0].play(0);
   gamestate=0;
+
+  //Coordenadas da comida
+  comida = new float[nCol][nLin];
+  arrayComida();
+
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -98,34 +111,44 @@ void draw() {
 
   case 0:   //Mostra as opções
     background(0);      //Limpa o ecrã
-    showMenu(); 
+    showMenu();
     break;
 
   case 1:   //Inicia o jogo Single Player
     background(0);
-    startGame(); 
+    startGame();
     break;
 
   case 2:   //Inicia o jogo Multiplayer
     background(0);
-    startGameMultiplayer(); 
+    startGameMultiplayer();
     break;
 
   case 3:   //Mostra as pontuações
     background(0);
-    showScores(); 
-    break; 
+    showScores();
+    break;
 
   case 4:   //Mostra a ajuda
     background(0);
-    showHelp(); 
-    break; 
+    showHelp();
+    break;
 
   case 5:   //Termina o jogo
     background(0);
     gameoverSound();
     endGame(win);
     break;
+  }
+
+  if (gamestate==1) {
+    comida[((int)px_pac - 35)/50][((int)py_pac - 35)/50] = 2.0; // REVIEW
+    startGame();
+  }
+
+    if (gamestate==2) {
+    comida[((int)px_pac - 35)/50][((int)py_pac - 35)/50] = 2.0; // REVIEW
+    startGameMultiplayer();
   }
 
   //Detecta quando o Pacman ganha (obtêm a pontuação máxima)
@@ -154,7 +177,7 @@ void showMenu() {
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
   //Texto
-  PFont f=createFont(font, 30, false); 
+  PFont f=createFont(font, 30, false);
   textFont(f);
   fill(ui);
 
@@ -166,14 +189,14 @@ void showMenu() {
   textAlign(CENTER);
 
   //Executa as opções
-  switch (key) { 
-  case '1' : 
+  switch (key) {
+  case '1' :
     gamestate=1;
     break;
-  case '2' : 
+  case '2' :
     gamestate=2;
     break;
-  case '3' : 
+  case '3' :
     gamestate=3;
     break;
   case 'H' :
@@ -189,19 +212,24 @@ void showMenu() {
 void startGame() {
   background(0);
   desenharLabirinto();
+  if (justStarted) { // REVIEW
+    posicaoComida();
+    justStarted = !justStarted; // REVIEW
+  }
+  caminhoPac();
   desenharPontos();
   desenharPacman(rotatePacmanStop(), rotatePacmanStart());
 
   //Consoante a velocidade, desenha o fantasma correspondente
   int i=0;
-  if (vx_ghost<0) i=2;  
+  if (vx_ghost<0) i=2;
   if (vx_ghost>0) i=3;
   if (vy_ghost<0) i=1;
-  desenharFantasma(i); 
+  desenharFantasma(i);
   moveGhost();
 
   set_vx_ghost=2;
-  set_vy_ghost=2; 
+  set_vy_ghost=2;
 
   //Impede que os fantasmas saiam dos limites do ecrã
   if (px_ghost > centroX(nCol))
@@ -211,7 +239,7 @@ void startGame() {
   if (py_ghost > centroY(nLin))
     vy_ghost = -vy_ghost;
   if (py_ghost < centroY(1))
-    vy_ghost = -vy_ghost; 
+    vy_ghost = -vy_ghost;
 
   //Implementa a velocidade
   px_ghost += vx_ghost;
@@ -222,6 +250,11 @@ void startGame() {
 void startGameMultiplayer() {
   background(0);
   desenharLabirinto();
+  if (justStarted) { // REVIEW
+    posicaoComida();
+    justStarted = !justStarted; // REVIEW
+  }
+  caminhoPac();
   desenharPontos();
   desenharPacman(rotatePacmanStop(), rotatePacmanStart());
 
@@ -240,8 +273,8 @@ void startGameMultiplayer() {
 //Função que termina o jogo mostrando uma mensagem e retornando ao menu
 void endGame(int winner) {
   //Termina o jogo
- delay(2000);
- sound[1].close();
+  delay(2000);
+  sound[1].close();
   setup();
 
   //Limite
@@ -251,17 +284,17 @@ void endGame(int winner) {
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
   //Texto "Game Over"
-  PFont f=createFont(font, 30, false); 
+  PFont f=createFont(font, 30, false);
   textFont(f);
   fill(ui);
   text("Game Over", width/2, height/2-50);
 
   //Indica quem ganhou
-  if (winner==1) {	
-    text("Jogador 1 foi eliminado", width/2, height/2+50);
+  if (winner==1) {
+    text("Fantasma foi eliminado", width/2, height/2+50);
     //Print Pontuação para ficheiro
   } else if (winner==2) {
-    text("Jogador 2 foi eliminado", width/2, height/2+50);
+    text("Pacman foi eliminado", width/2, height/2+50);
     //Print Pontuação para ficheiro
   }
 
@@ -282,12 +315,12 @@ void showHelp() {
   strokeWeight(espacamento);
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
-  PFont f=createFont(font, 30, false); 
+  PFont f=createFont(font, 30, false);
   textFont(f);
   fill(#FFF308);
 
   //Título
-  textAlign(CENTER);	
+  textAlign(CENTER);
   text("Ajuda & Opções", width/2, 60);
 
   //Subtítulos
@@ -329,7 +362,7 @@ void showHelp() {
 
   /* Texto: setas direcionais
    * necessário utilizar outra fonte pois LithosPro-Black não possui estes caracteres) */
-  PFont f1=createFont("Arial", 30, false); 
+  PFont f1=createFont("Arial", 30, false);
   textFont(f1);
   textSize(19);
   textAlign(LEFT);
@@ -343,7 +376,7 @@ void showScores() {
   strokeWeight(espacamento);
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
-  PFont f=createFont(font, 30, false); 
+  PFont f=createFont(font, 30, false);
   textFont(f);
   fill(ui);
 
@@ -378,9 +411,29 @@ void showScores() {
   text("R | Reinciar as pontuações", (width/7)-50, 460);
 }
 //-----------------------------------------------------------------------------------
+//Função que liga (1) e desliga (0) o som
+void setSounds(int i) {
+  switch (i) {
+    case 0:
+      text("Som Desligado", width/2, height/2);
+      textSize(15);
+      textAlign(CENTER);
+      for (i=0; i<3; i++)
+        sound[i].mute();
+      break;
+
+    case 1:
+      text("Som Ligado", width/2, height/2);
+      textSize(15);
+      textAlign(CENTER);
+      for (i=0; i<3; i++)
+        sound[i].unmute();
+      break;
+  }
+}
 //Função que executa o som de fim de jogo
 void gameoverSound() {
-  sound[0].close(); 
+  sound[0].close();
   sound[2].close();
   noLoop();
   sound[1].play();
@@ -405,11 +458,11 @@ void moveGhost() {
 
   if (px_pac==px_ghost) {
     if (py_pac<py_ghost) {
-      vx_ghost=0; 
+      vx_ghost=0;
       vy_ghost=-set_vy_ghost;
     }
     if (py_pac>py_ghost) {
-      vx_ghost=0; 
+      vx_ghost=0;
       vy_ghost=set_vy_ghost;
     }
   }
@@ -418,11 +471,11 @@ void moveGhost() {
       vx_ghost=-set_vx_ghost;
       vy_ghost=0;
 
-      float cx = px_ghost-50;                
-      float cy = py_ghost;                   
-      color c = get((int)cx, (int)cy);       
+      float cx = px_ghost-50;
+      float cy = py_ghost;
+      color c = get((int)cx, (int)cy);
 
-      if (c == corObstaculos) {              
+      if (c == corObstaculos) {
         vx_ghost=0;
         px_ghost=(int)(px_ghost);
       }
@@ -431,52 +484,52 @@ void moveGhost() {
       vx_ghost=set_vx_ghost;
       vy_ghost=0;
 
-      float cx = px_ghost+50;                
-      float cy = py_ghost;                   
-      color c = get((int)cx, (int)cy);      
+      float cx = px_ghost+50;
+      float cy = py_ghost;
+      color c = get((int)cx, (int)cy);
 
-      if (c == corObstaculos) {              
-        vx_ghost=0;    
+      if (c == corObstaculos) {
+        vx_ghost=0;
         px_ghost=(int)(px_ghost);
       }
     }
-  } 
+  }
 
   if (py_pac<py_ghost) {
-    vx_ghost=0; 
+    vx_ghost=0;
     vy_ghost=-set_vy_ghost;
   }
   if (py_pac>py_ghost) {
-    vx_ghost=0; 
+    vx_ghost=0;
     vy_ghost=set_vy_ghost;
   }
   if (px_pac<px_ghost) {
-    vx_ghost=-set_vx_ghost; 
+    vx_ghost=-set_vx_ghost;
     vy_ghost=0;
-    float cx = px_ghost-50;                
-    float cy = py_ghost;                   
-    color c = get((int)cx, (int)cy);       
+    float cx = px_ghost-50;
+    float cy = py_ghost;
+    color c = get((int)cx, (int)cy);
 
-    if (c == corObstaculos) {              
+    if (c == corObstaculos) {
       vx_ghost=0;
       px_ghost=(int)(px_ghost);
     }
   }
   if (px_pac>px_ghost) {
-    vx_ghost=set_vx_ghost; 
+    vx_ghost=set_vx_ghost;
     vy_ghost=0;
 
-    float cx = px_ghost+50;                
-    float cy = py_ghost;                   
-    color c = get((int)cx, (int)cy);      
+    float cx = px_ghost+50;
+    float cy = py_ghost;
+    color c = get((int)cx, (int)cy);
 
-    if (c == corObstaculos) {              
-      vx_ghost=0;    
+    if (c == corObstaculos) {
+      vx_ghost=0;
       px_ghost=(int)(px_ghost);
     }
   }
 
-  if ((px_pac==px_ghost) && (py_pac==py_ghost)) 
+  if ((px_pac==px_ghost) && (py_pac==py_ghost))
     detectedColision=1;
   else {
     detectedColision=0;
@@ -487,10 +540,10 @@ void moveGhost() {
 //Função chamada quando existe input do teclado
 void keyPressed() {
 
-  //Move o Fantasma (WASD) 
+  //Move o Fantasma (WASD)
   if (gamestate==2) {      //Garante que só é possivel controlar o fantasma no modo Multijogador
     //Left A Key
-    if ( key == 'a' || key == 'A' ) {      
+    if ( key == 'a' || key == 'A' ) {
       float cx = px_ghost-50;                //Para a célula ao lado esquerdo da actual
       float cy = py_ghost;                   //...da mesma linha
       color c = get((int)cx, (int)cy);       //Obtém a cor dessa célula
@@ -500,7 +553,7 @@ void keyPressed() {
       }
 
       //Impede o fantasma de sair da janela
-      if (px_ghost < centroX(1)) {           
+      if (px_ghost < centroX(1)) {
         px_ghost = px_ghost + 50;
       }
     }
@@ -516,7 +569,7 @@ void keyPressed() {
         px_ghost = px_ghost + 50;
       }
 
-      if (px_ghost > centroX(nCol)) { 
+      if (px_ghost > centroX(nCol)) {
         px_ghost = px_ghost - 50;
       }
     }
@@ -532,7 +585,7 @@ void keyPressed() {
         py_ghost = py_ghost - 50;
       }
 
-      if (py_ghost < centroY(1)) { 
+      if (py_ghost < centroY(1)) {
         py_ghost = py_ghost + 50;
       }
     }
@@ -548,13 +601,13 @@ void keyPressed() {
         py_ghost = py_ghost + 50;
       }
 
-      if (py_ghost > centroY(nLin)) { 
+      if (py_ghost > centroY(nLin)) {
         py_ghost = py_ghost - 50;
       }
     }
   }
-  //------------------------------------------------------------------------------------------------------------ 
-  //Move o Pacman (arrow keys) 
+  //------------------------------------------------------------------------------------------------------------
+  //Move o Pacman (arrow keys)
 
   //Left Arrow Key
   if ( keyCode == LEFT ) {
@@ -615,22 +668,22 @@ void keyPressed() {
       py_pac = py_pac - 50;
     }
   }
-  //------------------------------------------------------------------------------------------------------------ 
+  //------------------------------------------------------------------------------------------------------------
   //Detecta colisões
-  if ((px_pac==px_ghost) && (py_pac==py_ghost)) { 
+  if ((px_pac==px_ghost) && (py_pac==py_ghost)) {
     detectedColision=1;
   } else {
     detectedColision=0;
-  } 
+  }
 
-  //------------------------------------------------------------------------------------------------------------ 
-  //Interacção com o utilizador
+  //------------------------------------------------------------------------------------------------------------
+  //Interação com o utilizador
   //Pausa o jogo
   PFont f=createFont(font, 30, false);
   textFont(f);
   fill(ui);
 
-  if ((key == 'P') || (key == 'p') || (key == ' ')) { 
+  if ((key == 'P') || (key == 'p') || (key == ' ')) {
     if (gamestate==1 || gamestate==2) {      //Garante que só entra em pausa se estiver no jogo
       if (looping) {
         noLoop();
@@ -652,10 +705,10 @@ void keyPressed() {
     }
   }
 
-  //Reincia o jogo/retorna ao menu 
+  //Reincia o jogo/retorna ao menu
   if (key == ESC) {
     key=0;
-    sound[0].close();		//Garante que quando o jogo sai de um estado Game Over, não são repetidos sons 
+    sound[0].close();		//Garante que quando o jogo sai de um estado Game Over, não são repetidos sons
     sound[1].close();
     sound[2].close();
     setup();				//E que o ecrã é actualizado
@@ -672,9 +725,13 @@ void keyPressed() {
 
   //Desliga/Liga o Som
   if (key == 'm' || key == 'M') {
-    for (int i=0; i<3; i++) {
-      if (sound[i].isMuted()==true) sound[i].unmute();
-      if (sound[i].isMuted()==false) sound[i].mute();
+    if (soundEnabled) {
+      setSounds(0);
+      soundEnabled=false;
+    }
+    if (!soundEnabled) {
+      setSounds(1);
+      soundEnabled=true;
     }
   }
   //Reincia as pontuações
@@ -723,6 +780,18 @@ float rotatePacmanStart() {
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
+//preenche o array com "2" nas coordenadas por onde o pac passou, o que vai impedir de serem desenhadas bolas neste sitio
+void caminhoPac(){
+
+  for (int i=1; i<=nCol; i++){
+    for (int j=1; j<=nLin; j++) {
+        if((px_pac==i)&&(py_pac==j))
+            comida[i][j]=2;
+      }
+    }
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que desenha o labirinto
 void desenharLabirinto () {
 
@@ -742,10 +811,10 @@ void desenharLabirinto () {
   //desenharObstaculo(5, 4, nCol-4, nLin-4);
 
   /* Desenha um obstáculo interno de um labirinto:
-   * x: índice da célula inicial segundo eixo dos X - gama (1..nCol) 
+   * x: índice da célula inicial segundo eixo dos X - gama (1..nCol)
    * y: índice da célula inicial segundo eixo dos Y - gama (1..nLin)
    * numC: nº de colunas (células) segundo eixo dos X (largura do obstáculo)
-   * numL: nº de linhas (células) segundo eixo dos Y (altura do obstáculo) 
+   * numL: nº de linhas (células) segundo eixo dos Y (altura do obstáculo)
    */
 }
 
@@ -765,7 +834,7 @@ void desenharObstaculo(int x, int y, int numC, int numL) {
   rect(x0, y0, larg, comp);
 }
 
-/* Desenhar pontos nas células vazias (que não fazem parte de um obstáculo). 
+/* Desenhar pontos nas células vazias (que não fazem parte de um obstáculo).
  	 * Esta função usa a cor de fundo no ecrã para determinar se uma célula está vazia ou se faz parte de um obstáculo.
  	 */
 
@@ -779,16 +848,41 @@ void desenharPontos() {
   noStroke();
 
   // Insere um ponto nas células vazias
-  for (int i=1; i<=nCol; i++)                  
+  for (int i=1; i<=nCol; i++){
     for (int j=1; j<=nLin; j++) {
-      cx = centroX(i);
-      cy = centroY(j);
-      color c = get((int)cx, (int)cy);
-      if (c != corObstaculos) {
-        fill(255);
-        ellipse(cx, cy, pRaio/3, pRaio/3);
+        cx = centroX(i);
+        cy = centroY(j);
+        color c = get((int)cx, (int)cy);
+        if ((comida[i-1][j-1] == 1)&&(c != corObstaculos)) { //impedir que as bolas sejam desenhadas nos obstaculos e em sitios onde o pac passou
+          fill(255);
+          ellipse(cx, cy, pRaio/2, pRaio/2);
+        }
       }
     }
+}
+
+//-----------------------------------------------------------------------------------
+//Função que inicializa   /preenche o array com as coordenadas da comida
+void arrayComida() {
+  for (int i=1; i<=nCol; i++){
+    for (int j=1; j<=nLin; j++) {
+          comida[i-1][j-1] = 1;
+    }
+  }
+}
+
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//Função que preeche o array com as coordenadas da comida
+void posicaoComida() {
+
+  for (int i=1; i<=nCol; i++){
+    for (int j=1; j<=nLin; j++) {
+        if ((get((int)i, (int)j) != corObstaculos)) { //impedir que as bolas sejam desenhadas nos obstaculos e em sitios onde o pac passou
+          comida[i-1][j-1]= 1;
+        }
+    }
+  }
+
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -806,7 +900,7 @@ float centroY(int lin) {
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Funções para Pontuações -- ainda não testadas nem verificadas
 //Função que obtém pontuações de um ficheiro
-int[] ReadScores_File () throws IOException {  
+int[] ReadScores_File () throws IOException {
   File file= new File ("scores.txt");
 
   Scanner in = new Scanner (file);
@@ -828,7 +922,7 @@ int[] ReadScores_File () throws IOException {
 //Função que imprime as pontuações num ficheiro
 void PrintScores_File (int[] scores, int[] scores2) throws IOException {
   //Single Player Mode
-  File file = new File ("scores_singleplayer.txt");       
+  File file = new File ("scores_singleplayer.txt");
   PrintWriter out=new PrintWriter (new FileWriter(file));  //FileWriter impede que o texto anterior seja apagado.
 
   for (int i=0; i<scores.length; i++) {
@@ -839,7 +933,7 @@ void PrintScores_File (int[] scores, int[] scores2) throws IOException {
   out.close();
 
   //Multiplayer Mode
-  File file2 = new File ("scores_multiplayer.txt");       
+  File file2 = new File ("scores_multiplayer.txt");
   PrintWriter out2=new PrintWriter (new FileWriter(file2));  //FileWriter impede que o texto anterior seja apagado.
 
   for (int j=0; j<scores.length; j++) {
