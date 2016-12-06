@@ -1,5 +1,5 @@
-/* Maria João Lavoura //<>//
- * Pedro Teixeira
+/* Maria João Lavoura N. Mec. 84681
+ * Pedro Teixeira N. Mec. 84715
  *
  * Programação I | Trabalho Prático
  * Turma P8
@@ -34,7 +34,7 @@ int red_ghost_img;
 int gamestate, old_gamestate;
 
 //Estado do jogo (novo jogo)
-//boolean justStarted = true; // REVIEW
+boolean justStarted = true; // REVIEW
 
 //Detectada colisão? (1=Sim, 2=Não)
 int detectedColision;
@@ -45,7 +45,7 @@ int win;
 //Som (1: Som de Início, 2: Som de Fim de Jogo, 3: Som Comer Ponto)
 Minim minim;
 AudioPlayer sound[]=new AudioPlayer[3];
-boolean soundEnabled;
+boolean soundEnabled=true;
 
 //array bolas=comida
 float comida[][];
@@ -92,7 +92,7 @@ void setup() {
   sound[0]=minim.loadFile("start.mp3");
   sound[1]=minim.loadFile("gameover.mp3");
   sound[2]=minim.loadFile("eatpoint.mp3");
-  soundEnabled=true;
+  //soundEnabled=true;
 
   //Som de Início
   if (soundEnabled=true && gamestate!=5) sound[0].play(0);
@@ -101,7 +101,6 @@ void setup() {
   //Coordenadas da comida
   comida = new float[nCol][nLin];
   arrayComida();
-
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -146,7 +145,7 @@ void draw() {
     startGame();
   }
 
-    if (gamestate==2) {
+  if (gamestate==2) {
     comida[((int)px_pac - 35)/50][((int)py_pac - 35)/50] = 2.0; // REVIEW
     startGameMultiplayer();
   }
@@ -211,7 +210,7 @@ void showMenu() {
 //Começa o jogo Single Player
 void startGame() {
   background(0);
-  desenharLabirinto();
+  desenharLabirintoSP();
   if (justStarted) { // REVIEW
     posicaoComida();
     justStarted = !justStarted; // REVIEW
@@ -249,7 +248,7 @@ void startGame() {
 //Começa o jogo multijogador
 void startGameMultiplayer() {
   background(0);
-  desenharLabirinto();
+  desenharLabirintoMP();
   if (justStarted) { // REVIEW
     posicaoComida();
     justStarted = !justStarted; // REVIEW
@@ -291,7 +290,7 @@ void endGame(int winner) {
 
   //Indica quem ganhou
   if (winner==1) {
-    text("Fantasma foi eliminado", width/2, height/2+50);
+    text("Pacman venceu", width/2, height/2+50);
     //Print Pontuação para ficheiro
   } else if (winner==2) {
     text("Pacman foi eliminado", width/2, height/2+50);
@@ -411,24 +410,18 @@ void showScores() {
   text("R | Reinciar as pontuações", (width/7)-50, 460);
 }
 //-----------------------------------------------------------------------------------
-//Função que liga (1) e desliga (0) o som
-void setSounds(int i) {
-  switch (i) {
-    case 0:
-      text("Som Desligado", width/2, height/2);
-      textSize(15);
-      textAlign(CENTER);
-      for (i=0; i<3; i++)
-        sound[i].mute();
-      break;
+//Função que retoma (soundEnabled=true) ou pausa (soundEnabled=false) a reprodução dos sons
+void pauseSounds() {
+  if (!soundEnabled) {
+    sound[0].mute();
+    sound[1].mute();
+    sound[2].mute();
+  }
 
-    case 1:
-      text("Som Ligado", width/2, height/2);
-      textSize(15);
-      textAlign(CENTER);
-      for (i=0; i<3; i++)
-        sound[i].unmute();
-      break;
+  if (soundEnabled) {
+    sound[0].unmute();
+    sound[1].unmute();
+    sound[2].unmute();
   }
 }
 //Função que executa o som de fim de jogo
@@ -629,7 +622,7 @@ void keyPressed() {
     float cx = px_pac+50;
     float cy = py_pac;
     color c = get((int)cx, (int)cy);
-
+    sound[2].play(0);
     if (c != corObstaculos) {
       px_pac = px_pac +  50;
     }
@@ -644,7 +637,7 @@ void keyPressed() {
     float cx = px_pac;
     float cy = py_pac-50;
     color c = get((int)cx, (int)cy);
-
+    sound[2].play(0);
     if (c != corObstaculos) {
       py_pac = py_pac - 50;
     }
@@ -659,7 +652,7 @@ void keyPressed() {
     float cx=px_pac;
     float cy=py_pac+50;
     color c = get((int)cx, (int)cy);
-
+    sound[2].play(0);
     if (c != corObstaculos) {
       py_pac = py_pac + 50;
     }
@@ -711,7 +704,7 @@ void keyPressed() {
     sound[0].close();		//Garante que quando o jogo sai de um estado Game Over, não são repetidos sons
     sound[1].close();
     sound[2].close();
-    setup();				//E que o ecrã é actualizado
+    //setup();				//E que o ecrã é actualizado
     loop();
     setup();
   }
@@ -726,13 +719,11 @@ void keyPressed() {
   //Desliga/Liga o Som
   if (key == 'm' || key == 'M') {
     if (soundEnabled) {
-      setSounds(0);
       soundEnabled=false;
-    }
-    if (!soundEnabled) {
-      setSounds(1);
+    } else if (!soundEnabled) {
       soundEnabled=true;
     }
+    pauseSounds();
   }
   //Reincia as pontuações
 }
@@ -781,19 +772,20 @@ float rotatePacmanStart() {
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //preenche o array com "2" nas coordenadas por onde o pac passou, o que vai impedir de serem desenhadas bolas neste sitio
-void caminhoPac(){
+void caminhoPac() {
 
-  for (int i=1; i<=nCol; i++){
+  for (int i=1; i<=nCol; i++) {
     for (int j=1; j<=nLin; j++) {
-        if((px_pac==i)&&(py_pac==j))
-            comida[i][j]=2;
+      if ((px_pac==i)&&(py_pac==j)) {
+        comida[i][j]=2;
       }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que desenha o labirinto
-void desenharLabirinto () {
+void desenharLabirintoSP () {
 
   //Desenha a fronteira da área de jogo
   fill(0);
@@ -802,11 +794,49 @@ void desenharLabirinto () {
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
   //Desenha obstáculos
-  desenharObstaculo(3, 2, 1, 2); // P
-  desenharObstaculo(2, 2, 1, 4); // P
-  desenharObstaculo(5, 2, 3, 1);
-  desenharObstaculo(5, 5, 3, 1);
-  desenharObstaculo(6, 3, 1, 2);
+  desenharObstaculo(1, 6, 1, 2); // A
+  desenharObstaculo(3, 2, 1, 3); // B
+  desenharObstaculo(2, 9, 3, 1); //C
+  desenharObstaculo(5, 6, 1, 1); //D
+  desenharObstaculo(6, 3, 1, 1); //E
+  desenharObstaculo(9, 8, 1, 1); //F
+  desenharObstaculo(10, 2, 3, 1); //G
+  desenharObstaculo(10, 5, 1, 1); //H
+  desenharObstaculo(12, 7, 1, 3); //I
+  desenharObstaculo(14, 4, 1, 2); //J
+  //desenharObstaculo(2, 4, 1, nLin-4);
+  //desenharObstaculo(5, 4, nCol-4, nLin-4);
+
+  /* Desenha um obstáculo interno de um labirinto:
+   * x: índice da célula inicial segundo eixo dos X - gama (1..nCol)
+   * y: índice da célula inicial segundo eixo dos Y - gama (1..nLin)
+   * numC: nº de colunas (células) segundo eixo dos X (largura do obstáculo)
+   * numL: nº de linhas (células) segundo eixo dos Y (altura do obstáculo)
+   */
+}
+
+void desenharLabirintoMP () {
+
+  //Desenha a fronteira da área de jogo
+  fill(0);
+  stroke(corObstaculos);
+  strokeWeight(espacamento);
+  rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
+
+  //Desenha obstáculos
+  desenharObstaculo(2, 2, 1, 2); // A
+  desenharObstaculo(2, 2, 1, 1); // B
+  desenharObstaculo(2, 9, 1, 1);//C
+  desenharObstaculo(4, 4, 2, 1);//D
+  desenharObstaculo(4, 7, 2, 1);//E
+  desenharObstaculo(6, 2, 4, 1);//F
+  desenharObstaculo(7, 5, 2, 2);//G
+  desenharObstaculo(6, 9, 4, 1);//H
+  desenharObstaculo(10, 4, 2, 1);//I
+  desenharObstaculo(10, 7, 2, 1);//J
+  desenharObstaculo(13, 2, 1, 1);//K
+  desenharObstaculo(13, 9, 1, 1);//L
+  desenharObstaculo(14, 5, 1, 2);//M
   //desenharObstaculo(2, 4, 1, nLin-4);
   //desenharObstaculo(5, 4, nCol-4, nLin-4);
 
@@ -820,7 +850,7 @@ void desenharLabirinto () {
 
 //-----------------------------------------------------------------------------------
 //Função que desenha obstáculos
-void desenharObstaculo(int x, int y, int numC, int numL) {
+void desenharObstaculo (int x, int y, int numC, int numL) {
   float x0, y0, larg, comp;
 
   x0 = margemH + (x-1) * tamanho;
@@ -835,11 +865,27 @@ void desenharObstaculo(int x, int y, int numC, int numL) {
 }
 
 /* Desenhar pontos nas células vazias (que não fazem parte de um obstáculo).
- 	 * Esta função usa a cor de fundo no ecrã para determinar se uma célula está vazia ou se faz parte de um obstáculo.
- 	 */
+ * Esta função usa a cor de fundo no ecrã para determinar se uma célula está vazia ou se faz parte de um obstáculo.
+ */
 
 //-----------------------------------------------------------------------------------
 //Função que desenha pontos
+void initArray () {
+  float cx, cy;
+
+  // Insere um ponto nas células vazias
+  for (int i=1; i<=nCol; i++) {
+    for (int j=1; j<=nLin; j++) {
+      cx = centroX(i);
+      cy = centroY(j);
+      color c = get((int)cx, (int)cy);
+      if ((c != corObstaculos)) { //impedir que as bolas sejam desenhadas nos obstaculos e em sitios onde o pac passou
+        comida[i-1][j-1]=1;
+      }
+    }
+  }
+}
+
 void desenharPontos() {
   float cx, cy;
 
@@ -848,25 +894,28 @@ void desenharPontos() {
   noStroke();
 
   // Insere um ponto nas células vazias
-  for (int i=1; i<=nCol; i++){
+  for (int i=1; i<=nCol; i++) {
     for (int j=1; j<=nLin; j++) {
-        cx = centroX(i);
-        cy = centroY(j);
-        color c = get((int)cx, (int)cy);
-        if ((comida[i-1][j-1] == 1)&&(c != corObstaculos)) { //impedir que as bolas sejam desenhadas nos obstaculos e em sitios onde o pac passou
-          fill(255);
-          ellipse(cx, cy, pRaio/2, pRaio/2);
-        }
+      cx = centroX(i);
+      cy = centroY(j);
+      color c = get((int)cx, (int)cy);
+      if ((comida[i-1][j-1] == 1)&&(c != corObstaculos)) { //impedir que as bolas sejam desenhadas nos obstaculos e em sitios onde o pac passou
+        fill(255);
+        ellipse(cx, cy, pRaio/2, pRaio/2);
+      }
+      if (c!= corObstaculos) {
+        //count_points++;
       }
     }
+  }
 }
 
 //-----------------------------------------------------------------------------------
-//Função que inicializa   /preenche o array com as coordenadas da comida
+//Função que inicializa/preenche o array com as coordenadas da comida
 void arrayComida() {
-  for (int i=1; i<=nCol; i++){
+  for (int i=1; i<=nCol; i++) {
     for (int j=1; j<=nLin; j++) {
-          comida[i-1][j-1] = 1;
+      comida[i-1][j-1] = 1;
     }
   }
 }
@@ -875,14 +924,13 @@ void arrayComida() {
 //Função que preeche o array com as coordenadas da comida
 void posicaoComida() {
 
-  for (int i=1; i<=nCol; i++){
+  for (int i=1; i<=nCol; i++) {
     for (int j=1; j<=nLin; j++) {
-        if ((get((int)i, (int)j) != corObstaculos)) { //impedir que as bolas sejam desenhadas nos obstaculos e em sitios onde o pac passou
-          comida[i-1][j-1]= 1;
-        }
+      if ((get((int)i, (int)j) != corObstaculos)) { //impedir que as bolas sejam desenhadas nos obstaculos e em sitios onde o pac passou
+        comida[i-1][j-1]= 1;
+      }
     }
   }
-
 }
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
@@ -917,7 +965,6 @@ int[] ReadScores_File () throws IOException {
   in.close();
   return scores;
 }
-
 
 //Função que imprime as pontuações num ficheiro
 void PrintScores_File (int[] scores, int[] scores2) throws IOException {
