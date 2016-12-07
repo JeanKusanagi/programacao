@@ -1,32 +1,33 @@
-/* Maria João Lavoura N. Mec. 84681
+/* Maria João Lavoura N. Mec. 84681 //<>//
  * Pedro Teixeira N. Mec. 84715
  *
  * Programação I | Trabalho Prático
  * Turma P8
  */
+
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Importação de bibliotecas utilizadas
 import java.io.*;
 import java.util.Scanner;
-import ddf.minim.*;
+import ddf.minim.*;                             //Som
 
 //Parâmetros do labirinto
-int nCol, nLin;                                 // Nº de linhas e de colunas
-int tamanho = 50;                               // Tamanho (largura e altura) das células do labirinto
-int espacamento = 2;                            // Espaço livre entre células
-float margemV, margemH;                         // Margem livre na vertical e na horizontal para assegurar que as células são quadrangulares
-color corObstaculos =  color(100, 0, 128);      // Cor de fundo dos obstáculos
-color ui=#FFF308;                               // Cor do texto e dos limites dos menus
-String font="data\\LithosPro-Black.otf";        // Fonte da UI
+int nCol, nLin;                                 //Nº de linhas e de colunas
+int tamanho = 50;                               //Tamanho (largura e altura) das células do labirinto
+int espacamento = 2;                            //Espaço livre entre células
+float margemV, margemH;                         //Margem livre na vertical e na horizontal para assegurar que as células são quadrangulares
+color corObstaculos =  color(100, 0, 128);      //Cor de fundo dos obstáculos
+color ui=#FFF308;                               //Cor do texto e dos limites dos menus
+String font="data\\LithosPro-Black.otf";        //Fonte da UI
 
-//Parâmetros Pacman
+//Parâmetros do Pacman
 float px_pac, py_pac, pRaio;        //Posição
 float vx_pac, vy_pac;               //Velocidade
 
 //Parâmetros dos fantasmas
 float px_ghost, py_ghost;           //Posição
 float vx_ghost, vy_ghost;           //Velocidade
-float set_vx_ghost, set_vy_ghost;
+float set_vx_ghost, set_vy_ghost;   //Módulo da velocidade
 PImage[] red_ghost= new PImage[4];  //Imagens
 int red_ghost_img;
 
@@ -49,6 +50,10 @@ boolean soundEnabled=true;
 
 //array bolas=comida
 float comida[][];
+
+//Pontuações (1=Single Player, 2=Multiplayer)
+int scores1[]=new int[10];
+int scores2[]=new int[10];
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 void setup() {
@@ -92,7 +97,6 @@ void setup() {
   sound[0]=minim.loadFile("start.mp3");
   sound[1]=minim.loadFile("gameover.mp3");
   sound[2]=minim.loadFile("eatpoint.mp3");
-  //soundEnabled=true;
 
   //Som de Início
   if (soundEnabled=true && gamestate!=5) sound[0].play(0);
@@ -102,7 +106,6 @@ void setup() {
   comida = new float[nCol][nLin];
   arrayComida();
 }
-
 //-----------------------------------------------------------------------------------------------------------------------------------------
 void draw() {
 
@@ -180,11 +183,11 @@ void showMenu() {
   textFont(f);
   fill(ui);
 
-  text("1 - 1 Jogador", width/2, height/2+110);
-  text("2 - 2 Jogadores", width/2, height/2+150);
-  text("3 - Pontuações", width/2, height/2+190);
+  text("1 | 1 Jogador", width/2, height/2+110);
+  text("2 | 2 Jogadores", width/2, height/2+150);
+  text("3 | Pontuações", width/2, height/2+190);
   textSize(15);
-  text("H - Ajuda e Opções", width/2, height/2+230);
+  text("H | Ajuda e Opções", width/2, height/2+230);
   textAlign(CENTER);
 
   //Executa as opções
@@ -196,6 +199,12 @@ void showMenu() {
     gamestate=2;
     break;
   case '3' :
+     try {
+    scores1=readScores_File(1, 6);
+    scores2=readScores_File(1, 6);
+  }
+  catch (IOException ioe) {print("IOError");
+  }
     gamestate=3;
     break;
   case 'H' :
@@ -271,9 +280,11 @@ void startGameMultiplayer() {
 //-----------------------------------------------------------------------------------
 //Função que termina o jogo mostrando uma mensagem e retornando ao menu
 void endGame(int winner) {
-  //Termina o jogo
+  //Garante que o som de gameover é reproduzido mas não entra em loop
   delay(2000);
   sound[1].close();
+
+  //Reinicia o jogo
   setup();
 
   //Limite
@@ -305,7 +316,6 @@ void endGame(int winner) {
   //Retorna ao menu;
   gamestate=0;
 }
-
 //-----------------------------------------------------------------------------------
 //Função que imprime a ajuda
 void showHelp() {
@@ -369,7 +379,7 @@ void showHelp() {
 }
 //-----------------------------------------------------------------------------------
 //Função que imprime as pontuações
-void showScores() {
+void showScores () {
   fill(0, 0);
   stroke(ui);
   strokeWeight(espacamento);
@@ -381,7 +391,7 @@ void showScores() {
 
   //Título
   textAlign(CENTER);
-  text("Pontuações", width/2, 60);
+  text("Pontuações Máximas", width/2, 60);
 
   //Subtítulos
   textAlign(LEFT);
@@ -389,25 +399,11 @@ void showScores() {
   text("1 Jogador", (width/7), 110);
   text("2 Jogadores", 4*(width/7)+50, 110);
 
-  //Imprimir pontuações (score1[] para single player, score2[] para multiplayer)
-  //for (int i=0; i<scores1.lenght; i++) {
-  //  String score=scores1[i];
-  //   textSize(18);
-  //  textAlign(LEFT);
-  //  text(score, (width/7)+50, 160+40*i);
-  //}
-
-  //for (int i=0; i<scores2.lenght; i++) {
-  //  String score=scores2[i];
-  //   textSize(18);
-  //  textAlign(LEFT);
-  //  text(score, (width/7)+50, 160+40*i);
-  //}
-
-  //Fazer reset das pontuações : ainda não implementado
-  textSize(18);
-  textAlign(LEFT);
-  text("R | Reinciar as pontuações", (width/7)-50, 460);
+  //Imprimir pontuações (1 para single player, 2 para multiplayer)
+  print(scores1);
+  print(scores2);
+  printScores(scores1, (width/7), 160);
+  printScores(scores2, 4*(width/7)+50, 160);
 }
 //-----------------------------------------------------------------------------------
 //Função que retoma (soundEnabled=true) ou pausa (soundEnabled=false) a reprodução dos sons
@@ -431,14 +427,12 @@ void gameoverSound() {
   noLoop();
   sound[1].play();
 }
-
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que desenha o Pacman
 void desenharPacman(float start, float stop) {
   fill(232, 239, 40);
   arc(px_pac, py_pac, pRaio, pRaio, stop, start);
 }
-
 //-----------------------------------------------------------------------------------
 //Função que desenha os fantasmas
 void desenharFantasma(int i) {
@@ -528,7 +522,6 @@ void moveGhost() {
     detectedColision=0;
   }
 }
-
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função chamada quando existe input do teclado
 void keyPressed() {
@@ -698,7 +691,7 @@ void keyPressed() {
     }
   }
 
-  //Reincia o jogo/retorna ao menu
+  //Reinicia o jogo/retorna ao menu
   if (key == ESC) {
     key=0;
     sound[0].close();		//Garante que quando o jogo sai de um estado Game Over, não são repetidos sons
@@ -725,10 +718,8 @@ void keyPressed() {
     }
     pauseSounds();
   }
-  //Reincia as pontuações
 }
-
-////----------------------------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que roda pacman
 float rotatePacmanStop() {
   if ( keyCode == LEFT ) {
@@ -769,7 +760,6 @@ float rotatePacmanStart() {
     }
   }
 }
-
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //preenche o array com "2" nas coordenadas por onde o pac passou, o que vai impedir de serem desenhadas bolas neste sitio
 void caminhoPac() {
@@ -782,8 +772,7 @@ void caminhoPac() {
     }
   }
 }
-
-//-----------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------
 //Função que desenha o labirinto
 void desenharLabirintoSP () {
 
@@ -839,13 +828,6 @@ void desenharLabirintoMP () {
   desenharObstaculo(14, 5, 1, 2);//M
   //desenharObstaculo(2, 4, 1, nLin-4);
   //desenharObstaculo(5, 4, nCol-4, nLin-4);
-
-  /* Desenha um obstáculo interno de um labirinto:
-   * x: índice da célula inicial segundo eixo dos X - gama (1..nCol)
-   * y: índice da célula inicial segundo eixo dos Y - gama (1..nLin)
-   * numC: nº de colunas (células) segundo eixo dos X (largura do obstáculo)
-   * numL: nº de linhas (células) segundo eixo dos Y (altura do obstáculo)
-   */
 }
 
 //-----------------------------------------------------------------------------------
@@ -947,46 +929,108 @@ float centroY(int lin) {
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Funções para Pontuações -- ainda não testadas nem verificadas
-//Função que obtém pontuações de um ficheiro
-int[] ReadScores_File () throws IOException {
-  File file= new File ("scores.txt");
+//Função que obtém pontuações (do Single Player - 1, do Mulitplayer - 2) de um ficheiro
+static int[] readScores_File (int n, int j) throws IOException {
 
+  //Decide qual o nome do ficheiro a ler
+  String path = "";
+  switch (n) {
+  case 1:
+    path="scores_singleplayer.txt";
+    break;
+  case 2:
+    path="scores_multiplayer.txt";
+    break;
+  }
+
+  //Scanner para ler do ficheiro
+  File file = new File (path);
   Scanner in = new Scanner (file);
-  int scores[] = new int[(int) file.length()];
+
+  //Array temporária com todos os valores do ficheiro
+  int array_temp[] = new int[(int)file.length()];
   int i=0;
 
   while (in.hasNextInt()) {
-    String s = in.next();
-    if (!in.hasNext()) break;
-    scores[i] = Integer.parseInt(s);
+    String s = in.nextLine();
+    //if (!in.hasNext()) break;
+    array_temp[i] = Integer.parseInt(s);
     i++;
   }
 
   in.close();
-  return scores;
+
+  //Ordenar os valores (ordem decrescente)
+  orderArray(array_temp);
+
+  //Criar uma nova array com os j valores (neste caso pontuações) pretendidas
+  int array[]=new int[j];
+  for (int k=0; k<j; k++) {
+    array[k]=array_temp[k];
+  }
+  return array;
 }
 
-//Função que imprime as pontuações num ficheiro
-void PrintScores_File (int[] scores, int[] scores2) throws IOException {
-  //Single Player Mode
-  File file = new File ("scores_singleplayer.txt");
-  PrintWriter out=new PrintWriter (new FileWriter(file));  //FileWriter impede que o texto anterior seja apagado.
+//Função que imprime as pontuações (do Single Player - 1, do Mulitplayer - 2) num ficheiro
+static void printScores_File (int[] array, int n, int j) throws IOException {
+  //Decide qual o nome do ficheiro a ler
+  String path = "";
+  switch (n) {
+  case 1:
+    path="scores_singleplayer.txt";
+    break;
+  case 2:
+    path="scores_multiplayer.txt";
+    break;
+  }
 
-  for (int i=0; i<scores.length; i++) {
-    int num=scores[i];
-    out.print(num);
-    out.print(" ");
+  //Scanner para escrever no ficheiro
+  File file = new File (path);
+  PrintWriter out=new PrintWriter (file);
+
+  //Ordenar os valores (ordem decrescente)
+  orderArray(array);
+
+  //Determina quantos valores x a imprimir no ficheiro: j valores ou todos os valores da array (se array.lenght<j)
+  int x=0;
+  if (array.length>j) x=j;
+  if (array.length<=j) x=array.length;
+
+  //Imprime os n valores (neste caso pontuações) no ficheiro
+  for (int i=0; i<x; i++) {
+    int num=array[i];
+    out.println(num);
   }
   out.close();
+}
 
-  //Multiplayer Mode
-  File file2 = new File ("scores_multiplayer.txt");
-  PrintWriter out2=new PrintWriter (new FileWriter(file2));  //FileWriter impede que o texto anterior seja apagado.
+//Ordena por ordem decrescente os valores de uma array
+static void orderArray (int[] array) {
+  int temp, u=0;
+  do {
+    u=0;
+    for (int i=0; i<=array.length-2; i++) {
+      if (array[i] < array[i+1]) {
+        temp = array[i];
+        array[i] = array[i+1];
+        array[i+1] = temp;
+        u++;
+      }
+    }
+  } while (u!=0);
+}
 
-  for (int j=0; j<scores.length; j++) {
-    int num=scores2[j];
-    out2.print(num);
-    out2.print(" ");
+//Função que imprime as pontuações no ecrã
+void printScores (int array[], int col, int lin) {
+  //col e lin dão a posição do texto (horizontal e vertical)
+  //Formatação
+  PFont f=createFont(font, 30, false);
+  textFont(f);
+  fill(ui);
+  textSize(18);
+  textAlign(LEFT);
+
+  for (int i=0; i<array.length; i++) {
+    text(array[i], col, lin+i*40);
   }
-  out2.close();
 }
