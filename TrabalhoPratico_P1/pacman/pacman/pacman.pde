@@ -5,6 +5,17 @@
  * Turma P8
  */
 
+//Escrever pontuação no ficheiro
+// try {
+//     //Garante que só é executado 1 vez (a função showScores é chamada na função draw e portanto chamada várias vezes)
+//     if (called_saveScores) {
+//       saveScores_File(PONTUAÇÃO, 2);
+//       called_saveScores = false;
+//     }
+//   }
+//   catch (IOException e) {
+//   };
+
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Importação de bibliotecas utilizadas
 import java.io.*;
@@ -43,17 +54,19 @@ int detectedColision;
 //Vencedor (1=Pacman, 2=Fantasma)
 int win;
 
-//Som (1: Som de Início, 2: Som de Fim de Jogo, 3: Som Comer Ponto)
+//Som
 Minim minim;
-AudioPlayer sound[]=new AudioPlayer[3];
-boolean soundEnabled=true;
+AudioPlayer sound[]=new AudioPlayer[3];       //Array com as músicas utilizadas
+boolean soundEnabled=true;                    //Som activo/desactivado
 
 //array bolas=comida
 float comida[][];
 
 //Pontuações (1=Single Player, 2=Multiplayer)
-int scores1[]=new int[10];
-int scores2[]=new int[10];
+int scores1[]=new int[10];                    //Array de inteiros com as pontuações para o modo Single Player
+int scores2[]=new int[10];                    //Array de inteiros com as pontuações para o modo Multi Player
+int num_scores=8;                             //Número de pontuações máximas a apresentar
+boolean called_saveScores=true;
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 void setup() {
@@ -92,7 +105,7 @@ void setup() {
   red_ghost[2]=loadImage("data\\ghost_left.png");
   red_ghost[3]= loadImage("data\\ghost_right.png");
 
-  //Inicializar os sons
+  //Inicializar os sons  (1: Som de Início, 2: Som de Fim de Jogo, 3: Som Comer Ponto)
   minim = new Minim(this);
   sound[0]=minim.loadFile("start.mp3");
   sound[1]=minim.loadFile("gameover.mp3");
@@ -199,12 +212,6 @@ void showMenu() {
     gamestate=2;
     break;
   case '3' :
-     try {
-    scores1=readScores_File(1, 6);
-    scores2=readScores_File(1, 6);
-  }
-  catch (IOException ioe) {print("IOError");
-  }
     gamestate=3;
     break;
   case 'H' :
@@ -400,8 +407,19 @@ void showScores () {
   text("2 Jogadores", 4*(width/7)+50, 110);
 
   //Imprimir pontuações (1 para single player, 2 para multiplayer)
-  print(scores1);
-  print(scores2);
+
+  //Lida com IOExceptions
+  try {
+    if (called_saveScores) {
+        saveScores_File(5, 2);
+        saveScores_File(1, 1);
+          called_saveScores = false;
+       }
+    scores1=readScores_File(1, num_scores);
+    scores2=readScores_File(2, num_scores);
+  }
+  catch (IOException e) {
+  };
   printScores(scores1, (width/7), 160);
   printScores(scores2, 4*(width/7)+50, 160);
 }
@@ -697,8 +715,7 @@ void keyPressed() {
     sound[0].close();		//Garante que quando o jogo sai de um estado Game Over, não são repetidos sons
     sound[1].close();
     sound[2].close();
-    //setup();				//E que o ecrã é actualizado
-    loop();
+    loop();             //E que o ecrã é actualizado
     setup();
   }
 
@@ -928,18 +945,18 @@ float centroY(int lin) {
 //
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
-//Funções para Pontuações -- ainda não testadas nem verificadas
+//Funções para Pontuações
 //Função que obtém pontuações (do Single Player - 1, do Mulitplayer - 2) de um ficheiro
-static int[] readScores_File (int n, int j) throws IOException {
+int[] readScores_File (int n, int j) throws IOException {
 
   //Decide qual o nome do ficheiro a ler
   String path = "";
   switch (n) {
   case 1:
-    path="scores_singleplayer.txt";
+    path=dataPath("scores_singleplayer.txt");   //Na pasta data do programa, o ficheiro "scores_singleplayer.txt"
     break;
   case 2:
-    path="scores_multiplayer.txt";
+    path=dataPath("scores_multiplayer.txt");
     break;
   }
 
@@ -953,7 +970,6 @@ static int[] readScores_File (int n, int j) throws IOException {
 
   while (in.hasNextInt()) {
     String s = in.nextLine();
-    //if (!in.hasNext()) break;
     array_temp[i] = Integer.parseInt(s);
     i++;
   }
@@ -962,50 +978,49 @@ static int[] readScores_File (int n, int j) throws IOException {
 
   //Ordenar os valores (ordem decrescente)
   orderArray(array_temp);
-
-  //Criar uma nova array com os j valores (neste caso pontuações) pretendidas
-  int array[]=new int[j];
-  for (int k=0; k<j; k++) {
-    array[k]=array_temp[k];
+  
+  /* Determina a dimensão, dim, da nova array
+   * Se o ficheiro tiver array_temp.length valores e se for pedido uma array com j valores
+   * Se n<j, dim=n; senão, se n>j, dim=j
+   */
+  
+  int dim=0;
+  if (array_temp.length<j) dim=array_temp.length;
+  else dim=j;
+  
+  //Criar uma nova array com os dim valores (neste caso pontuações) pretendidas
+  int array[]=new int[dim];
+  for (int k=0; k<dim; k++) {
+    array[k]=array_temp[k];        
   }
   return array;
 }
 
-//Função que imprime as pontuações (do Single Player - 1, do Mulitplayer - 2) num ficheiro
-static void printScores_File (int[] array, int n, int j) throws IOException {
+//Função que imprime 1 pontuação (do Single Player - 1, do Multiplayer - 2) num ficheiro
+void saveScores_File (int num, int n) throws IOException {
   //Decide qual o nome do ficheiro a ler
   String path = "";
   switch (n) {
   case 1:
-    path="scores_singleplayer.txt";
+    path=dataPath("scores_singleplayer.txt");
     break;
   case 2:
-    path="scores_multiplayer.txt";
+    path=dataPath("scores_multiplayer.txt");
     break;
   }
 
   //Scanner para escrever no ficheiro
   File file = new File (path);
-  PrintWriter out=new PrintWriter (file);
+  FileWriter tmp = new FileWriter(file, true);
+  PrintWriter out = new PrintWriter(tmp);
 
-  //Ordenar os valores (ordem decrescente)
-  orderArray(array);
-
-  //Determina quantos valores x a imprimir no ficheiro: j valores ou todos os valores da array (se array.lenght<j)
-  int x=0;
-  if (array.length>j) x=j;
-  if (array.length<=j) x=array.length;
-
-  //Imprime os n valores (neste caso pontuações) no ficheiro
-  for (int i=0; i<x; i++) {
-    int num=array[i];
-    out.println(num);
-  }
+  //Imprime o número no fim do ficheiro
+  out.println(num);
   out.close();
 }
 
-//Ordena por ordem decrescente os valores de uma array
-static void orderArray (int[] array) {
+//Ordena por ordem decrescente os valores de uma array. Também teria sido possível utilizar a função sort() para ordenar e reverse() para inverter a ordem
+void orderArray (int[] array) {
   int temp, u=0;
   do {
     u=0;
