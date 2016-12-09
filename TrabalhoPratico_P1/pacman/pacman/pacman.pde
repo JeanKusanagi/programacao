@@ -1,20 +1,9 @@
-/* Maria João Lavoura N. Mec. 84681 //<>//
+/* Maria João Lavoura N. Mec. 84681
  * Pedro Teixeira N. Mec. 84715
  *
  * Programação I | Trabalho Prático
  * Turma P8
  */
-
-//Escrever pontuação no ficheiro
-// try {
-//     //Garante que só é executado 1 vez (a função showScores é chamada na função draw e portanto chamada várias vezes)
-//     if (called_saveScores) {
-//       saveScores_File(PONTUAÇÃO, 2);
-//       called_saveScores = false;
-//     }
-//   }
-//   catch (IOException e) {
-//   };
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Importação de bibliotecas utilizadas
@@ -32,17 +21,17 @@ color ui=#FFF308;                               //Cor do texto e dos limites dos
 String font="data\\LithosPro-Black.otf";        //Fonte da UI
 
 //Parâmetros do Pacman
-float px_pac, py_pac, pRaio;        //Posição
-float vx_pac, vy_pac;               //Velocidade
+float px_pac, py_pac, pRaio;                    //Posição
+float vx_pac, vy_pac;                           //Velocidade
 
 //Parâmetros dos fantasmas
-float px_ghost, py_ghost;           //Posição
-float vx_ghost, vy_ghost;           //Velocidade
-float set_vx_ghost, set_vy_ghost;   //Módulo da velocidade
-PImage[] red_ghost= new PImage[4];  //Imagens
+float px_ghost, py_ghost;                       //Posição
+float vx_ghost, vy_ghost;                       //Velocidade
+float set_vx_ghost, set_vy_ghost;               //Módulo da velocidade
+PImage[] red_ghost= new PImage[4];              //Imagens
 int red_ghost_img;
 
-//Estado do jogo (0=Menu, 1=Single Player, 2=Multiplayer, 3=Pontuações, 4=Ajuda)
+//Estado do jogo (0=Menu, 1=Single Player, 2=Multiplayer, 3=Pontuações, 4=Ajuda, 5=Gameover)
 int gamestate, old_gamestate;
 
 //Estado do jogo (novo jogo)
@@ -63,12 +52,26 @@ boolean soundEnabled=true;                    //Som activo/desactivado
 float comida[][];
 
 //Pontuações (1=Single Player, 2=Multiplayer)
+int max_points;
+int initial_points_sp=120;
+int initial_points_mp=116;
+int drawn_points;                             //Número de pontos desenhados (gameover quando drawn_points=0)
+int score;                                    //Pontuação do jogo (pontuação=[pontuação máxima-drawn_points]*factor)
+int factor=100;                               //Quanto vale cada ponto em termos de pontuação
 int scores1[]=new int[10];                    //Array de inteiros com as pontuações para o modo Single Player
 int scores2[]=new int[10];                    //Array de inteiros com as pontuações para o modo Multi Player
 int num_scores=8;                             //Número de pontuações máximas a apresentar
 boolean called_saveScores=true;
 
+//Ponto especial
+boolean blinker;                              //Permite tornar o ponto intermitente
+int px_specialpoint=8;                        //Célula do ponto
+int py_specialpoint=8;
+color color_specialpoint=#f44242;             //Cor do ponto
+boolean drawnSpecialPoint;
+
 //-----------------------------------------------------------------------------------------------------------------------------------------
+//Função que começa o jogo. Executada quando o programa inicia ou reinicia (através da tecla ESC)
 void setup() {
   //Tamanho, título e ícone da janela
   size(720, 520);
@@ -101,9 +104,9 @@ void setup() {
 
   //Inicialização das imagens
   red_ghost[0]=loadImage("data\\ghost.png");
-  red_ghost[1]= loadImage("data\\ghost_up.png");
+  red_ghost[1]=loadImage("data\\ghost_up.png");
   red_ghost[2]=loadImage("data\\ghost_left.png");
-  red_ghost[3]= loadImage("data\\ghost_right.png");
+  red_ghost[3]=loadImage("data\\ghost_right.png");
 
   //Inicializar os sons  (1: Som de Início, 2: Som de Fim de Jogo, 3: Som Comer Ponto)
   minim = new Minim(this);
@@ -118,10 +121,13 @@ void setup() {
   //Coordenadas da comida
   comida = new float[nCol][nLin];
   arrayComida();
+
+  //Ponto especial
+  drawnSpecialPoint=false;
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------
+//Função que executa os diferentes modos do jogo (0: Menu, 1: Jogo Single Player, 2: Jogo Multiplayer, 3: Pontuações, 4: Ajuda, 5: Gameover)
 void draw() {
-
   switch (gamestate) {
 
   case 0:   //Mostra as opções
@@ -132,11 +138,13 @@ void draw() {
   case 1:   //Inicia o jogo Single Player
     background(0);
     startGame();
+    drawSpecialPoint();
     break;
 
   case 2:   //Inicia o jogo Multiplayer
     background(0);
     startGameMultiplayer();
+    drawSpecialPoint();
     break;
 
   case 3:   //Mostra as pontuações
@@ -157,20 +165,24 @@ void draw() {
   }
 
   if (gamestate==1) {
-    comida[((int)px_pac - 35)/50][((int)py_pac - 35)/50] = 2.0; // REVIEW
+    //Sinaliza que o Pacman esteve numa célula
+    comida[((int)px_pac - 35)/50][((int)py_pac - 35)/50] = 2.0;
     startGame();
+    //Detecta quando o Pacman ganha (não são desenhados mais pontos)
+    if (drawn_points==0) {
+      gamestate=5;
+      win=1;
+    }
   }
 
   if (gamestate==2) {
-    comida[((int)px_pac - 35)/50][((int)py_pac - 35)/50] = 2.0; // REVIEW
+    comida[((int)px_pac - 35)/50][((int)py_pac - 35)/50] = 2.0;
     startGameMultiplayer();
+    if (drawn_points==0) {
+      gamestate=5;
+      win=1;
+    }
   }
-
-  //Detecta quando o Pacman ganha (obtêm a pontuação máxima)
-  //if () {
-  //gamestate=5;
-  //  win=1;
-  //}
 
   //Detecta quando o fantasma ganha (colisão entre o fantasma e o Pacman)
   if (detectedColision==1) {
@@ -179,7 +191,7 @@ void draw() {
   }
 }
 //-----------------------------------------------------------------------------------
-//Imprime o menu
+//Função que imprime o menu
 void showMenu() {
   //Fundo e limite
   PImage background;
@@ -223,17 +235,26 @@ void showMenu() {
   }
 }
 //-----------------------------------------------------------------------------------
-//Começa o jogo Single Player
+//Função que começa o jogo Single Player
 void startGame() {
   background(0);
   desenharLabirintoSP();
-  if (justStarted) { // REVIEW
+  max_points=initial_points_sp;
+  if (justStarted) {
     posicaoComida();
-    justStarted = !justStarted; // REVIEW
+    justStarted = !justStarted;
   }
+
   caminhoPac();
   desenharPontos();
   desenharPacman(rotatePacmanStop(), rotatePacmanStart());
+
+  //Desenha o ponto especial (só quando foram comidos mais de 1/2 e menos de 3/4 dos pontos iniciais)
+  if (drawn_points<(initial_points_sp/2) && drawn_points>(initial_points_sp/4)) { //<>//
+    drawSpecialPoint();
+    //Detecta se o Pacman come o ponto especial
+    detectSpecialPoint();
+    }
 
   //Consoante a velocidade, desenha o fantasma correspondente
   int i=0;
@@ -261,17 +282,26 @@ void startGame() {
   py_ghost += vy_ghost;
 }
 //-----------------------------------------------------------------------------------
-//Começa o jogo multijogador
+//Função que começa o jogo multijogador
 void startGameMultiplayer() {
   background(0);
   desenharLabirintoMP();
-  if (justStarted) { // REVIEW
+  max_points=initial_points_mp;
+  if (justStarted) {
     posicaoComida();
-    justStarted = !justStarted; // REVIEW
+    justStarted = !justStarted;
   }
+
   caminhoPac();
   desenharPontos();
   desenharPacman(rotatePacmanStop(), rotatePacmanStart());
+
+  //Desenha o ponto especial (só quando foram comidos mais de 1/2 e menos de 3/4 dos pontos iniciais)
+  if (drawn_points<(initial_points_mp/2) && drawn_points>(initial_points_mp/4)) { //<>//
+    drawSpecialPoint(); //<>//
+    //Detecta se o Pacman come o ponto especial
+    detectSpecialPoint();
+  }
 
   //Desenha o fantasma inicial
   desenharFantasma(0);
@@ -301,23 +331,54 @@ void endGame(int winner) {
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
   //Texto "Game Over"
-  PFont f=createFont(font, 30, false);
+  PFont f=createFont(font, 50, false);
   textFont(f);
   fill(ui);
-  text("Game Over", width/2, height/2-50);
+  text("Game Over", width/2, (height/4));
 
   //Indica quem ganhou
+  textSize(30);
   if (winner==1) {
-    text("Pacman venceu", width/2, height/2+50);
+    text("Pacman venceu", width/2, (height/4)+50);
+    //Calcula a pontuação
+    score=(max_points-drawn_points)*factor;
+
     //Print Pontuação para ficheiro
+    try {
+        //Garante que só é executado 1 vez (a função showScores é chamada na função draw e portanto chamada várias vezes)
+        if (called_saveScores) {
+          if (max_points==initial_points_sp) saveScores_File(score, 1);     //Singleplayer
+          if (max_points==initial_points_mp) saveScores_File(score, 2);     //Multiplayer
+          called_saveScores=false;
+        }
+      }
+      catch (IOException e) {
+      };
+
   } else if (winner==2) {
-    text("Pacman foi eliminado", width/2, height/2+50);
+    text("Pacman foi eliminado", width/2, (height/2));
+    //Calcula a pontuação
+    score=(max_points-drawn_points)*factor;
+
     //Print Pontuação para ficheiro
+    try {
+        //Garante que só é executado 1 vez (a função showScores é chamada na função draw e portanto chamada várias vezes)
+        if (called_saveScores) {
+          if (max_points==initial_points_sp) saveScores_File(score, 1);     //Singleplayer
+          if (max_points==initial_points_mp) saveScores_File(score, 2);     //Multiplayer
+          called_saveScores=false;
+        }
+      }
+      catch (IOException e) {
+      };
   }
+
+  text("Pontuação:", (width/2)-50, (height/2)+50);
+  text(score, (width/2)+100, (height/2)+50);
 
   //Mensagem para retornar ao menu
   textSize(15);
-  text("Pressione ESC para voltar", width/2, height/2+100);
+  text("Pressione ESC para voltar", width/2, 500);
   textAlign(CENTER);
 
   //Retorna ao menu;
@@ -407,14 +468,7 @@ void showScores () {
   text("2 Jogadores", 4*(width/7)+50, 110);
 
   //Imprimir pontuações (1 para single player, 2 para multiplayer)
-
-  //Lida com IOExceptions
-  try {
-    if (called_saveScores) {
-        saveScores_File(5, 2);
-        saveScores_File(1, 1);
-          called_saveScores = false;
-       }
+  try {         //Lida com IOExceptions
     scores1=readScores_File(1, num_scores);
     scores2=readScores_File(2, num_scores);
   }
@@ -475,15 +529,6 @@ void moveGhost() {
     if (px_pac<px_ghost) {
       vx_ghost=-set_vx_ghost;
       vy_ghost=0;
-
-      float cx = px_ghost-50;
-      float cy = py_ghost;
-      color c = get((int)cx, (int)cy);
-
-      if (c == corObstaculos) {
-        vx_ghost=0;
-        px_ghost=(int)(px_ghost);
-      }
     }
     if (px_pac>px_ghost) {
       vx_ghost=set_vx_ghost;
@@ -780,7 +825,6 @@ float rotatePacmanStart() {
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //preenche o array com "2" nas coordenadas por onde o pac passou, o que vai impedir de serem desenhadas bolas neste sitio
 void caminhoPac() {
-
   for (int i=1; i<=nCol; i++) {
     for (int j=1; j<=nLin; j++) {
       if ((px_pac==i)&&(py_pac==j)) {
@@ -790,7 +834,7 @@ void caminhoPac() {
   }
 }
 //------------------------------------------------------------------------------------
-//Função que desenha o labirinto
+//Funções que desenham os labirintos para o modo Single Player (SP) e Multi Player (MP)
 void desenharLabirintoSP () {
 
   //Desenha a fronteira da área de jogo
@@ -846,7 +890,6 @@ void desenharLabirintoMP () {
   //desenharObstaculo(2, 4, 1, nLin-4);
   //desenharObstaculo(5, 4, nCol-4, nLin-4);
 }
-
 //-----------------------------------------------------------------------------------
 //Função que desenha obstáculos
 void desenharObstaculo (int x, int y, int numC, int numL) {
@@ -862,13 +905,7 @@ void desenharObstaculo (int x, int y, int numC, int numL) {
   //strokeWeight(espacamento/2);
   rect(x0, y0, larg, comp);
 }
-
-/* Desenhar pontos nas células vazias (que não fazem parte de um obstáculo).
- * Esta função usa a cor de fundo no ecrã para determinar se uma célula está vazia ou se faz parte de um obstáculo.
- */
-
 //-----------------------------------------------------------------------------------
-//Função que desenha pontos
 void initArray () {
   float cx, cy;
 
@@ -885,12 +922,18 @@ void initArray () {
   }
 }
 
-void desenharPontos() {
+//Função que desenha pontos
+/* Desenhar pontos nas células vazias (que não fazem parte de um obstáculo).
+ * Esta função usa a cor de fundo no ecrã para determinar se uma célula está vazia ou se faz parte de um obstáculo.
+ */
+int desenharPontos() {
   float cx, cy;
 
   ellipseMode(CENTER);
   fill(255);
   noStroke();
+
+  drawn_points=0;   //Reset do número de pontos desenhados
 
   // Insere um ponto nas células vazias
   for (int i=1; i<=nCol; i++) {
@@ -901,12 +944,11 @@ void desenharPontos() {
       if ((comida[i-1][j-1] == 1)&&(c != corObstaculos)) { //impedir que as bolas sejam desenhadas nos obstaculos e em sitios onde o pac passou
         fill(255);
         ellipse(cx, cy, pRaio/2, pRaio/2);
-      }
-      if (c!= corObstaculos) {
-        //count_points++;
+        drawn_points++;                                   //Conta quantos pontos são desenhados
       }
     }
   }
+  return drawn_points;
 }
 
 //-----------------------------------------------------------------------------------
@@ -918,7 +960,6 @@ void arrayComida() {
     }
   }
 }
-
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que preeche o array com as coordenadas da comida
 void posicaoComida() {
@@ -938,12 +979,33 @@ float centroX(int col) {
   return margemH + (col - 0.5) * tamanho;
 }
 
-//Transformar o índice de uma célula em coordenada no ecrã
 float centroY(int lin) {
   return margemV + (lin - 0.5) * tamanho;
 }
-//
+//-----------------------------------------------------------------------------------------------------------------------------------------
+//Função que desenha um ponto especial
+void drawSpecialPoint () {
+  if (frameCount % 20 == 0 ) {
+    blinker = !blinker;
+  }
 
+  if (blinker) {
+    fill(color_specialpoint);
+    ellipse(centroX(px_specialpoint), centroY(py_specialpoint), pRaio/4, pRaio/4);
+  }
+
+  drawnSpecialPoint=true;
+}
+
+void detectSpecialPoint () {
+  if (drawnSpecialPoint==true) {
+    if ( px_pac==centroX(px_specialpoint) && py_pac==centroY(py_specialpoint) ) {
+      gamestate=5;
+      win=1;
+  }
+  }
+
+}
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Funções para Pontuações
 //Função que obtém pontuações (do Single Player - 1, do Mulitplayer - 2) de um ficheiro
@@ -978,20 +1040,20 @@ int[] readScores_File (int n, int j) throws IOException {
 
   //Ordenar os valores (ordem decrescente)
   orderArray(array_temp);
-  
+
   /* Determina a dimensão, dim, da nova array
    * Se o ficheiro tiver array_temp.length valores e se for pedido uma array com j valores
    * Se n<j, dim=n; senão, se n>j, dim=j
    */
-  
+
   int dim=0;
   if (array_temp.length<j) dim=array_temp.length;
   else dim=j;
-  
+
   //Criar uma nova array com os dim valores (neste caso pontuações) pretendidas
   int array[]=new int[dim];
   for (int k=0; k<dim; k++) {
-    array[k]=array_temp[k];        
+    array[k]=array_temp[k];
   }
   return array;
 }
