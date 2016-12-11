@@ -18,7 +18,7 @@ int espacamento = 2;                            //Espaço livre entre células
 float margemV, margemH;                         //Margem livre na vertical e na horizontal para assegurar que as células são quadrangulares
 color corObstaculos =  color(145, 168, 208);    //Cor de fundo dos obstáculos (original RGB: 100,0,128)
 color ui=#FFF308;                               //Cor do texto e dos limites dos menus
-String font="data\\LithosPro-Black.otf";        //Fonte da UI
+String font="LithosPro-Black.otf";              //Fonte da UI
 
 //Parâmetros do Pacman
 float px_pac, py_pac, pRaio;                    //Posição
@@ -30,6 +30,7 @@ Ghost pink=new Ghost();
 Ghost orange=new Ghost();
 Ghost blue=new Ghost();
 int red_ghost_img;
+PImage death_ghost;
 
 //Estado do jogo (0=Menu, 1=Single Player, 2=Multiplayer, 3=Pontuações, 4=Ajuda, 5=Gameover)
 int gamestate, old_gamestate;
@@ -69,6 +70,7 @@ int px_specialpoint=8;                        //Posição do ponto
 int py_specialpoint=8;
 color color_specialpoint=#818181;             //Cor do ponto
 boolean drawnSpecialPoint;                    //O ponto foi desenhado?
+boolean ghost_dead;
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que começa o jogo. Executada quando o programa inicia ou reinicia (através da tecla ESC)
@@ -82,7 +84,7 @@ void setup() {
   size(720, 520);
   background(0);
   surface.setTitle("Pacman | Maria João Lavoura | Pedro Teixeira");
-  PImage icon = loadImage("data\\icon.png");
+  PImage icon = loadImage(dataPath("icon.png"));
   surface.setIcon(icon);
 
   //Número de linhas e de colunas
@@ -97,8 +99,8 @@ void setup() {
   margemH = (height - nLin * tamanho) / 2.0;
 
   //Inicalização da posição inicial do Pacman
-  px_pac = centroX(1);
-  py_pac = centroY(2);
+  px_pac = centroX(2);
+  py_pac = centroY(1);
   pRaio = (tamanho - espacamento) / 2;
 
   //Inicalização dos parâmetros dos fantasmas
@@ -106,10 +108,10 @@ void setup() {
   red.py = centroY(1);
   pink.px = centroX(4);
   pink.py = centroY(7);
-  orange.px = centroX(1);
+  orange.px = centroX(14);
   orange.py = centroY(10);
-  //blue.px= centroX(2);
-  //blue.py= centroX(2);
+  blue.px= centroX(1);
+  blue.py= centroY(10);
   red.vx=0;                  //Velocidades inicias
   red.vy=0;
   pink.vx=0;
@@ -120,25 +122,27 @@ void setup() {
   blue.vy=0;
 
   //Inicialização das imagens
-  red.images[0]=loadImage("data\\red.png");
-  red.images[1]=loadImage("data\\red_up.png");
-  red.images[2]=loadImage("data\\red_left.png");
-  red.images[3]=loadImage("data\\red_right.png");
+  red.images[0]=loadImage(dataPath("red.png"));
+  red.images[1]=loadImage(dataPath("red_up.png"));
+  red.images[2]=loadImage(dataPath("red_left.png"));
+  red.images[3]=loadImage(dataPath("red_right.png"));
 
-  pink.images[0]=loadImage("data\\pink.png");
-  pink.images[1]=loadImage("data\\pink_up.png");
-  pink.images[2]=loadImage("data\\pink_left.png");
-  pink.images[3]=loadImage("data\\pink_right.png");
+  pink.images[0]=loadImage(dataPath("pink.png"));
+  pink.images[1]=loadImage(dataPath("pink_up.png"));
+  pink.images[2]=loadImage(dataPath("pink_left.png"));
+  pink.images[3]=loadImage(dataPath("pink_right.png"));
 
-  orange.images[0]=loadImage("data\\orange.png");
-  orange.images[1]=loadImage("data\\orange_up.png");
-  orange.images[2]=loadImage("data\\orange_left.png");
-  orange.images[3]=loadImage("data\\orange_right.png");
+  orange.images[0]=loadImage(dataPath("orange.png"));
+  orange.images[1]=loadImage(dataPath("orange_up.png"));
+  orange.images[2]=loadImage(dataPath("orange_left.png"));
+  orange.images[3]=loadImage(dataPath("orange_right.png"));
 
-  blue.images[0]=loadImage("data\\blue.png");
-  blue.images[1]=loadImage("data\\blue_up.png");
-  blue.images[2]=loadImage("data\\blue_left.png");
-  blue.images[3]=loadImage("data\\blue_right.png");
+  blue.images[0]=loadImage(dataPath("blue.png"));
+  blue.images[1]=loadImage(dataPath("blue_up.png"));
+  blue.images[2]=loadImage(dataPath("blue_left.png"));
+  blue.images[3]=loadImage(dataPath("blue_right.png"));
+
+  death_ghost=loadImage(dataPath("death_ghost.png"));
 
   //Inicializar os sons  (1: Som de Início, 2: Som de Fim de Jogo, 3: Som Comer Ponto)
   minim = new Minim(this);
@@ -156,6 +160,7 @@ void setup() {
 
   //Ponto especial
   drawnSpecialPoint=false;
+  ghost_dead=false;
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que executa os diferentes modos do jogo (0: Menu, 1: Jogo Single Player, 2: Jogo Multiplayer, 3: Pontuações, 4: Ajuda, 5: Gameover)
@@ -229,7 +234,7 @@ void draw() {
 void showMenu() {
   //Fundo e limite
   PImage background;
-  background = loadImage("data\\background.jpg");
+  background = loadImage(dataPath("background.jpg"));
   background(background);
 
   fill(0, 0);
@@ -291,25 +296,34 @@ void startGame() {
   }
 
   //Consoante a velocidade, desenha o fantasma correspondente
-  int i=0;
-  if (red.vx<0) i=2;
-  if (red.vx>0) i=3;
-  if (red.vy<0) i=1;
-  desenharFantasma(1, i);
-  int j=0;
-  if (pink.vx<0) j=2;
-  if (pink.vx>0) j=3;
-  if (pink.vy<0) j=1;
-  desenharFantasma(2, j);
-  int k=0;
-  if (orange.vx<0) k=2;
-  if (orange.vx>0) k=3;
-  if (orange.vy<0) k=1;
-  desenharFantasma(3, k);
-  int l=0;
-  if (blue.vx<0) l=2;
-  if (blue.vx>0) l=3;
-  if (blue.vy<0) l=1;
+  if (!ghost_dead) {
+    int i=0;
+    if (red.vx<0) i=2;
+    if (red.vx>0) i=3;
+    if (red.vy<0) i=1;
+    desenharFantasma(1, i);
+    int j=0;
+    if (pink.vx<0) j=2;
+    if (pink.vx>0) j=3;
+    if (pink.vy<0) j=1;
+    desenharFantasma(2, j);
+    int k=0;
+    if (orange.vx<0) k=2;
+    if (orange.vx>0) k=3;
+    if (orange.vy<0) k=1;
+    desenharFantasma(3, k);
+    int l=0;
+    if (blue.vx<0) l=2;
+    if (blue.vx>0) l=3;
+    if (blue.vy<0) l=1;
+    desenharFantasma(4, l);
+  }
+  if (ghost_dead) {
+    image(death_ghost, red.px, red.py, 30, 30);
+    image(death_ghost, pink.px, pink.py, 30, 30);
+    image(death_ghost, orange.px, orange.py, 30, 30);
+    image(death_ghost, blue.px, blue.py, 30, 30);
+  }
   //desenharFantasma(4, l);
   moveGhost();
 
@@ -332,7 +346,6 @@ void startGame() {
   orange.py += orange.vy;
   blue.px += blue.vx;
   blue.py += blue.vy;
-
 }
 //-----------------------------------------------------------------------------------
 //Função que começa o jogo multijogador
@@ -358,11 +371,16 @@ void startGameMultiplayer() {
   }
 
   //Desenha o fantasma inicial
-  desenharFantasma(1, 0);
+  if (!ghost_dead) desenharFantasma(1, 0);
 
   //Consoante a tecla pressionada, desenha o fantasma correspondente
-  if (keyPressed) {desenharFantasma(1, red_ghost_img);
-  } else if (!keyPressed) desenharFantasma(1, red_ghost_img);
+  if (keyPressed) {
+    if (!ghost_dead) desenharFantasma(1, red_ghost_img);
+    if (ghost_dead) image(death_ghost, red.px, red.py, 30, 30);
+  } else if (!keyPressed) {
+    if (!ghost_dead) desenharFantasma(1, red_ghost_img);
+    if (ghost_dead) image(death_ghost, red.px, red.py, 30, 30);
+  }
 }
 //-----------------------------------------------------------------------------------
 //Função que termina o jogo mostrando uma mensagem e retornando ao menu
@@ -578,82 +596,110 @@ void desenharFantasma(int i, int j) {
 //Função que move o fantasma (persegue o Pacman)
 void moveGhost() {
 
-  //red ghost
-  // v
-  red.vx=0;
-  red.vy= red.set_vy;
-
-  if (red.py==centroY(3) && (red.px>centroX(7))) {// <
-    red.vx =-red.set_vx ;
-    red.vy=0;
-  } else if ((red.px==centroX(7)) && (red.py==centroY(3))) {// v
-    red.vx =0;
+    //red ghost
+    // v
+    red.vx=0;
     red.vy= red.set_vy;
-  } else if ((red.py==centroY(5))&&(red.px!=centroX(1))) {// <
-    red.vx =-red.set_vx ;
-    red.vy=0;
-  } else if (red.px==centroX(1) && (red.py!=centroY(1))) {// ^
-    red.vx =0;
-    red.vy=-red.set_vx ;
-  } else if ((red.py==centroY(1))&&(red.px!=centroX(13))) {// >
-    red.vx = red.set_vy;
-    red.vy=0;
-  }
 
-  //pink ghost
-  // ^
-  pink.vx=0;
-  pink.vy=-pink.set_vy;
+    if (red.py==centroY(3) && (red.px>centroX(7))) {// <
+      red.vx =-red.set_vx ;
+      red.vy=0;
+    } else if ((red.px==centroX(7)) && (red.py==centroY(3))) {// v
+      red.vx =0;
+      red.vy= red.set_vy;
+    } else if ((red.py==centroY(5))&&(red.px!=centroX(1))) {// <
+      red.vx =-red.set_vx ;
+      red.vy=0;
+    } else if (red.px==centroX(1) && (red.py!=centroY(1))) {// ^
+      red.vx =0;
+      red.vy=-red.set_vx ;
+    } else if ((red.py==centroY(1))&&(red.px!=centroX(13))) {// >
+      red.vx = red.set_vy;
+      red.vy=0;
+    }
 
-  if (pink.py>centroY(2) && (pink.px==centroX(4))) {// ^
+    //pink ghost
+    // ^
     pink.vx=0;
     pink.vy=-pink.set_vy;
-  } else if (pink.py==centroY(2) && (pink.px<centroX(9))) {// >
-    pink.vx=pink.set_vx;
-    pink.vy=0;
-  } else if ((pink.px==centroX(9)) && (pink.py<centroY(4))) {// v
-    pink.vx=0;
-    pink.vy=pink.set_vy;
-  } else if ((pink.py==centroY(4))&&(pink.px<centroX(11))) {// >
-    pink.vx=pink.set_vx;
-    pink.vy=0;
-  } else if ((pink.px==centroX(11)) && (pink.py<centroY(9))) {// v
-    pink.vx=0;
-    pink.vy=pink.set_vy;
-  } else if ((pink.py==centroY(9))&&(pink.px>centroX(6))) {// <
-    pink.vx=-pink.set_vx;
-    pink.vy=0;
-  } else if ((pink.px==centroX(6)) && (pink.py>centroY(7))) {// ^
-    pink.vx=0;
-    pink.vy=-pink.set_vy;
-  } else if ((pink.py==centroY(7))&&(pink.px>centroX(4))) {// <
-    pink.vx=-pink.set_vx;
-    pink.vy=0;
-  }
 
-  //orange ghost
-  // ^
-  if (orange.py>centroY(8) && (orange.px==centroX(1))) {// ^
-    orange.vx=0;
-    orange.vy=-orange.set_vy;
-  } else if (orange.py==centroY(8) && (orange.px<centroX(8))) {// >
-    orange.vx=orange.set_vx;
-    orange.vy=0;
-  } else if (orange.px==centroX(8) && (orange.py>centroY(6))&& (orange.py<centroY(9))) {// ^
-    orange.vx=0;
-    orange.vy=-orange.set_vy;
-  } else if (orange.py==centroY(6) && (orange.px<centroX(14))) {// >
-    orange.vx=orange.set_vx;
-    orange.vy=0;
-  } else if ((orange.px==centroX(14)) && (orange.py<centroY(10))) {// v
-    orange.vx=0;
-    orange.vy=orange.set_vy;
-  } else if ((orange.py==centroY(10))&&(orange.px>centroX(1))) {// <
-    orange.vx=-orange.set_vx;
-    orange.vy=0;
-  }
+    if (pink.py>centroY(2) && (pink.px==centroX(4))) {// ^
+      pink.vx=0;
+      pink.vy=-pink.set_vy;
+    } else if (pink.py==centroY(2) && (pink.px<centroX(9))) {// >
+      pink.vx=pink.set_vx;
+      pink.vy=0;
+    } else if ((pink.px==centroX(9)) && (pink.py<centroY(4))) {// v
+      pink.vx=0;
+      pink.vy=pink.set_vy;
+    } else if ((pink.py==centroY(4))&&(pink.px<centroX(11))) {// >
+      pink.vx=pink.set_vx;
+      pink.vy=0;
+    } else if ((pink.px==centroX(11)) && (pink.py<centroY(9))) {// v
+      pink.vx=0;
+      pink.vy=pink.set_vy;
+    } else if ((pink.py==centroY(9))&&(pink.px>centroX(6))) {// <
+      pink.vx=-pink.set_vx;
+      pink.vy=0;
+    } else if ((pink.px==centroX(6)) && (pink.py>centroY(7))) {// ^
+      pink.vx=0;
+      pink.vy=-pink.set_vy;
+    } else if ((pink.py==centroY(7))&&(pink.px>centroX(4))) {// <
+      pink.vx=-pink.set_vx;
+      pink.vy=0;
+    }
 
-  if (((px_pac==red.px) && (py_pac==red.py)) || ((px_pac==pink.px) && (py_pac==pink.py)) || ((px_pac==orange.px) && (py_pac==orange.py)) || ((px_pac==blue.px) && (py_pac==blue.py)))
+    //orange ghost
+    if ((orange.py==centroY(10))&&(orange.px>centroX(8))) {// <
+      orange.vx=-orange.set_vx;
+      orange.vy=0;
+    } else if (orange.px==centroX(8) && (orange.py>centroY(6))&& (orange.py>centroY(9))) {// ^
+      orange.vx=0;
+      orange.vy=-orange.set_vy;
+    } else if (orange.py==centroY(6) && (orange.px<centroX(14))) {// >
+      orange.vx=orange.set_vx;
+      orange.vy=0;
+    } else if ((orange.px==centroX(14)) && (orange.py<centroY(10))) {// v
+      orange.vx=0;
+      orange.vy=orange.set_vy;
+    } else if ((orange.py==centroY(10))&&(orange.px>centroX(1))) {// <
+      orange.vx=-orange.set_vx;
+      orange.vy=0;
+    }else if (orange.px==centroX(8) && (orange.py>centroY(6))&& (orange.py>centroY(9))) {// ^
+      orange.vx=0;
+      orange.vy=-orange.set_vy;
+    }
+
+
+   // blue ghost
+    if (blue.py>centroY(8) && (blue.px==centroX(1))) {// ^
+      blue.vx=0;
+      blue.vy=-blue.set_vy;
+    } else if (blue.py==centroY(8) && (blue.px<centroX(2))) {// >
+      blue.vx=blue.set_vx;
+      blue.vy=0;
+    } else if (blue.px==centroX(2) && (blue.py>centroY(5))&& (blue.py<centroY(9))) {// ^
+      blue.vx=0;
+      blue.vy=-blue.set_vy;
+    } else if (blue.py==centroY(5) && (blue.px<centroX(6))) {// >
+      blue.vx=blue.set_vx;
+      blue.vy=0;
+    } else if ((blue.px==centroX(6)) && (blue.py<centroY(10))) {// v
+      blue.vx=0;
+      blue.vy=blue.set_vy;
+    } else if ((blue.py==centroY(10))&&(blue.px>centroX(1))) {// <
+      blue.vx=-blue.set_vx;
+      blue.vy=0;
+    }
+
+  //Deteca colisões entre os fantasmas e o Pacman
+  if (dist(px_pac,py_pac,red.px,red.py)<10)
+    detectedColision=1;
+  else if (dist(px_pac,py_pac,pink.px,pink.py)<10)
+    detectedColision=1;
+  else if (dist(px_pac,py_pac,orange.px,orange.py)<10)
+    detectedColision=1;
+  else if (dist(px_pac,py_pac,blue.px,blue.py)<10)
     detectedColision=1;
   else {
     detectedColision=0;
@@ -1069,18 +1115,32 @@ void drawSpecialPoint () {
     fill(color_specialpoint);
     ellipse(centroX(px_specialpoint), centroY(py_specialpoint), pRaio/4, pRaio/4);
   }
-
   drawnSpecialPoint=true;
 }
 
 void detectSpecialPoint () {
   if (drawnSpecialPoint==true) {
     if ( px_pac==centroX(px_specialpoint) && py_pac==centroY(py_specialpoint) ) {
+
+      //Oculta o ponto especial
+      fill(232, 239, 40);
+      ellipse(centroX(px_specialpoint), centroY(py_specialpoint), pRaio/4, pRaio/4);
+
+      int radiation=2;
+      do{noFill();
+        stroke(#ff0000);
+        ellipse(centroX(px_specialpoint), centroY(py_specialpoint), pRaio*radiation, pRaio*radiation);
+        radiation+=4;
+        ghost_dead=true;
+      }while(radiation<42);
+
+      ghost_dead=true;
       gamestate=5;
       win=1;
     }
   }
 }
+
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Funções para Pontuações
 //Função que obtém pontuações (do Single Player - 1, do Mulitplayer - 2) de um ficheiro
