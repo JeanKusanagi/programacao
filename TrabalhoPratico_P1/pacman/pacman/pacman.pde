@@ -75,10 +75,12 @@ boolean ghost_dead;
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que começa o jogo. Executada quando o programa inicia ou reinicia (através da tecla ESC)
 void setup() {
-  println("Trabalho Pratico de Programacao I : PACMAN Multijogador");
+  println("Trabalho Pratico de Programacao I : Pacman Multijogador");
   println("DETI - UA");
   println("Maria Joao Lavoura, N. Mec. 84681");
   println("Pedro Teixeira, N. Mec. 84715");
+  println("Jogo Iniciado");
+  println(" ");
 
   //Tamanho, título e ícone da janela
   size(720, 520);
@@ -605,7 +607,7 @@ void moveGhost() {
       red.vx =-red.set_vx ;
       red.vy=0;
     } else if ((red.px==centroX(7)) && (red.py==centroY(3))) {// v
-      red.vx =0;
+      red.vx=0;
       red.vy= red.set_vy;
     } else if ((red.py==centroY(5))&&(red.px!=centroX(1))) {// <
       red.vx =-red.set_vx ;
@@ -718,7 +720,7 @@ void keyPressed() {
       color c = get((int)cx, (int)cy);       //Obtém a cor dessa célula
 
       if (c != corObstaculos) {              //Se essa célula não for obstáculo
-        red.px = red.px - 50;            //Move o fantasma
+        red.px = red.px - 50;             //Move o fantasma
       }
       red_ghost_img=2;
       //Impede o fantasma de sair da janela
