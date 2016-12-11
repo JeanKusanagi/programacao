@@ -29,8 +29,8 @@ Ghost red=new Ghost();
 Ghost pink=new Ghost();
 Ghost orange=new Ghost();
 Ghost blue=new Ghost();
-int red_ghost_img;
-PImage death_ghost;
+int red_ghost_img;                              //No modo Singleplayer, determina qual a imagem a desenhar consoante a tecla pressionada
+PImage death_ghost;                             //Imagem do fantasma morto
 
 //Estado do jogo (0=Menu, 1=Single Player, 2=Multiplayer, 3=Pontuações, 4=Ajuda, 5=Gameover)
 int gamestate, old_gamestate;
@@ -49,13 +49,13 @@ Minim minim;
 AudioPlayer sound[]=new AudioPlayer[3];       //Array com as músicas utilizadas
 boolean soundEnabled=true;                    //Som activo/desactivado
 
-//array bolas=comida
+//Array bolas=comida
 float comida[][];
 
 //Pontuações (1=Single Player, 2=Multiplayer)
 int max_points;
-int initial_points_sp=120;
-int initial_points_mp=116;
+int initial_points_sp=120;                    //Número de pontos do labirinto do modo Single Player
+int initial_points_mp=116;                    //Número de pontos do labirinto do modo Multiplayer
 int drawn_points;                             //Número de pontos desenhados (gameover quando drawn_points=0)
 int score;                                    //Pontuação do jogo (pontuação=[pontuação máxima-drawn_points]*factor)
 int factor=100;                               //Quanto vale cada ponto em termos de pontuação
@@ -66,11 +66,11 @@ boolean called_saveScores=true;
 
 //Ponto especial
 boolean blinker;                              //Permite tornar o ponto intermitente
-int px_specialpoint=8;                        //Posição do ponto
-int py_specialpoint=8;
-color color_specialpoint=#818181;             //Cor do ponto
+int px_specialpoint=14;                        //Posição do ponto
+int py_specialpoint=6;
+color color_specialpoint=#990000;             //Cor do ponto
 boolean drawnSpecialPoint;                    //O ponto foi desenhado?
-boolean ghost_dead;
+boolean ghost_dead;                           //O ponto foi comido -- os fantasmas foram mortos?
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que começa o jogo. Executada quando o programa inicia ou reinicia (através da tecla ESC)
@@ -232,7 +232,7 @@ void draw() {
   }
 }
 //-----------------------------------------------------------------------------------
-//Função que imprime o menu
+//Função que imprime o menu inicial
 void showMenu() {
   //Fundo e limite
   PImage background;
@@ -276,11 +276,13 @@ void showMenu() {
   }
 }
 //-----------------------------------------------------------------------------------
-//Função que começa o jogo Single Player
+//Função que executa o jogo no modo Singleplayer
 void startGame() {
   background(0);
   desenharLabirintoSP();
+
   max_points=initial_points_sp;
+
   if (justStarted) {
     posicaoComida();
     justStarted = !justStarted;
@@ -288,6 +290,7 @@ void startGame() {
 
   caminhoPac();
   desenharPontos();
+
   desenharPacman(rotatePacmanStop(), rotatePacmanStart());
 
   //Desenha o ponto especial (só quando foram comidos mais de 1/2 e menos de 3/4 dos pontos iniciais)
@@ -320,13 +323,14 @@ void startGame() {
     if (blue.vy<0) l=1;
     desenharFantasma(4, l);
   }
+  //Se os fantasmas estiverem mortos (ponto especial)
   if (ghost_dead) {
     image(death_ghost, red.px, red.py, 30, 30);
     image(death_ghost, pink.px, pink.py, 30, 30);
     image(death_ghost, orange.px, orange.py, 30, 30);
     image(death_ghost, blue.px, blue.py, 30, 30);
   }
-  //desenharFantasma(4, l);
+
   moveGhost();
 
   //Define o módulo das velocidades dos fantasmas
@@ -350,11 +354,13 @@ void startGame() {
   blue.py += blue.vy;
 }
 //-----------------------------------------------------------------------------------
-//Função que começa o jogo multijogador
+//Função que começa o jogo no modo Multiplayer
 void startGameMultiplayer() {
   background(0);
   desenharLabirintoMP();
+
   max_points=initial_points_mp;
+
   if (justStarted) {
     posicaoComida();
     justStarted = !justStarted;
@@ -378,7 +384,7 @@ void startGameMultiplayer() {
   //Consoante a tecla pressionada, desenha o fantasma correspondente
   if (keyPressed) {
     if (!ghost_dead) desenharFantasma(1, red_ghost_img);
-    if (ghost_dead) image(death_ghost, red.px, red.py, 30, 30);
+    if (ghost_dead) image(death_ghost, red.px, red.py, 30, 30);       //Se o fantasma estiver morto (ponto especial)
   } else if (!keyPressed) {
     if (!ghost_dead) desenharFantasma(1, red_ghost_img);
     if (ghost_dead) image(death_ghost, red.px, red.py, 30, 30);
@@ -394,7 +400,7 @@ void endGame(int winner) {
   //Reinicia o jogo
   setup();
 
-  //Limite
+  //UI: Limite
   fill(0, 0);
   stroke(ui);
   strokeWeight(espacamento);
@@ -414,7 +420,7 @@ void endGame(int winner) {
     score=(max_points-drawn_points)*factor;
 
     //Print Pontuação para ficheiro
-    try {
+    try {   //Lida com IOExceptions
       //Garante que só é executado 1 vez (a função showScores é chamada na função draw e portanto chamada várias vezes)
       if (called_saveScores) {
         if (max_points==initial_points_sp) saveScores_File(score, 1);     //Singleplayer
@@ -455,8 +461,9 @@ void endGame(int winner) {
   gamestate=0;
 }
 //-----------------------------------------------------------------------------------
-//Função que imprime a ajuda
+//Função que imprime o ecrã de ajuda
 void showHelp() {
+  //Limite
   fill(0, 0);
   stroke(ui);
   strokeWeight(espacamento);
@@ -516,8 +523,9 @@ void showHelp() {
   text("\u2190 \u2192 \u2191 \u2193", (width/7)-50, 160); // u2... : UNICODE do caracter
 }
 //-----------------------------------------------------------------------------------
-//Função que imprime as pontuações
+//Função que imprime o ecrã das pontuações no ecrã
 void showScores () {
+  //Limite
   fill(0, 0);
   stroke(ui);
   strokeWeight(espacamento);
@@ -598,110 +606,110 @@ void desenharFantasma(int i, int j) {
 //Função que move o fantasma (persegue o Pacman)
 void moveGhost() {
 
-    //red ghost
-    // v
+  //red ghost
+  // v
+  red.vx=0;
+  red.vy= red.set_vy;
+
+  if (red.py==centroY(3) && (red.px>centroX(7))) {// <
+    red.vx =-red.set_vx ;
+    red.vy=0;
+  } else if ((red.px==centroX(7)) && (red.py==centroY(3))) {// v
     red.vx=0;
     red.vy= red.set_vy;
+  } else if ((red.py==centroY(5))&&(red.px!=centroX(1))) {// <
+    red.vx =-red.set_vx ;
+    red.vy=0;
+  } else if (red.px==centroX(1) && (red.py!=centroY(1))) {// ^
+    red.vx =0;
+    red.vy=-red.set_vx ;
+  } else if ((red.py==centroY(1))&&(red.px!=centroX(13))) {// >
+    red.vx = red.set_vy;
+    red.vy=0;
+  }
 
-    if (red.py==centroY(3) && (red.px>centroX(7))) {// <
-      red.vx =-red.set_vx ;
-      red.vy=0;
-    } else if ((red.px==centroX(7)) && (red.py==centroY(3))) {// v
-      red.vx=0;
-      red.vy= red.set_vy;
-    } else if ((red.py==centroY(5))&&(red.px!=centroX(1))) {// <
-      red.vx =-red.set_vx ;
-      red.vy=0;
-    } else if (red.px==centroX(1) && (red.py!=centroY(1))) {// ^
-      red.vx =0;
-      red.vy=-red.set_vx ;
-    } else if ((red.py==centroY(1))&&(red.px!=centroX(13))) {// >
-      red.vx = red.set_vy;
-      red.vy=0;
-    }
+  //pink ghost
+  // ^
+  pink.vx=0;
+  pink.vy=-pink.set_vy;
 
-    //pink ghost
-    // ^
+  if (pink.py>centroY(2) && (pink.px==centroX(4))) {// ^
     pink.vx=0;
     pink.vy=-pink.set_vy;
+  } else if (pink.py==centroY(2) && (pink.px<centroX(9))) {// >
+    pink.vx=pink.set_vx;
+    pink.vy=0;
+  } else if ((pink.px==centroX(9)) && (pink.py<centroY(4))) {// v
+    pink.vx=0;
+    pink.vy=pink.set_vy;
+  } else if ((pink.py==centroY(4))&&(pink.px<centroX(11))) {// >
+    pink.vx=pink.set_vx;
+    pink.vy=0;
+  } else if ((pink.px==centroX(11)) && (pink.py<centroY(9))) {// v
+    pink.vx=0;
+    pink.vy=pink.set_vy;
+  } else if ((pink.py==centroY(9))&&(pink.px>centroX(6))) {// <
+    pink.vx=-pink.set_vx;
+    pink.vy=0;
+  } else if ((pink.px==centroX(6)) && (pink.py>centroY(7))) {// ^
+    pink.vx=0;
+    pink.vy=-pink.set_vy;
+  } else if ((pink.py==centroY(7))&&(pink.px>centroX(4))) {// <
+    pink.vx=-pink.set_vx;
+    pink.vy=0;
+  }
 
-    if (pink.py>centroY(2) && (pink.px==centroX(4))) {// ^
-      pink.vx=0;
-      pink.vy=-pink.set_vy;
-    } else if (pink.py==centroY(2) && (pink.px<centroX(9))) {// >
-      pink.vx=pink.set_vx;
-      pink.vy=0;
-    } else if ((pink.px==centroX(9)) && (pink.py<centroY(4))) {// v
-      pink.vx=0;
-      pink.vy=pink.set_vy;
-    } else if ((pink.py==centroY(4))&&(pink.px<centroX(11))) {// >
-      pink.vx=pink.set_vx;
-      pink.vy=0;
-    } else if ((pink.px==centroX(11)) && (pink.py<centroY(9))) {// v
-      pink.vx=0;
-      pink.vy=pink.set_vy;
-    } else if ((pink.py==centroY(9))&&(pink.px>centroX(6))) {// <
-      pink.vx=-pink.set_vx;
-      pink.vy=0;
-    } else if ((pink.px==centroX(6)) && (pink.py>centroY(7))) {// ^
-      pink.vx=0;
-      pink.vy=-pink.set_vy;
-    } else if ((pink.py==centroY(7))&&(pink.px>centroX(4))) {// <
-      pink.vx=-pink.set_vx;
-      pink.vy=0;
-    }
-
-    //orange ghost
-    if ((orange.py==centroY(10))&&(orange.px>centroX(8))) {// <
-      orange.vx=-orange.set_vx;
-      orange.vy=0;
-    } else if (orange.px==centroX(8) && (orange.py>centroY(6))&& (orange.py>centroY(9))) {// ^
-      orange.vx=0;
-      orange.vy=-orange.set_vy;
-    } else if (orange.py==centroY(6) && (orange.px<centroX(14))) {// >
-      orange.vx=orange.set_vx;
-      orange.vy=0;
-    } else if ((orange.px==centroX(14)) && (orange.py<centroY(10))) {// v
-      orange.vx=0;
-      orange.vy=orange.set_vy;
-    } else if ((orange.py==centroY(10))&&(orange.px>centroX(1))) {// <
-      orange.vx=-orange.set_vx;
-      orange.vy=0;
-    }else if (orange.px==centroX(8) && (orange.py>centroY(6))&& (orange.py>centroY(9))) {// ^
-      orange.vx=0;
-      orange.vy=-orange.set_vy;
-    }
+  //orange ghost
+  if ((orange.py==centroY(10))&&(orange.px>centroX(8))) {// <
+    orange.vx=-orange.set_vx;
+    orange.vy=0;
+  } else if (orange.px==centroX(8) && (orange.py>centroY(6))&& (orange.py>centroY(9))) {// ^
+    orange.vx=0;
+    orange.vy=-orange.set_vy;
+  } else if (orange.py==centroY(6) && (orange.px<centroX(14))) {// >
+    orange.vx=orange.set_vx;
+    orange.vy=0;
+  } else if ((orange.px==centroX(14)) && (orange.py<centroY(10))) {// v
+    orange.vx=0;
+    orange.vy=orange.set_vy;
+  } else if ((orange.py==centroY(10))&&(orange.px>centroX(1))) {// <
+    orange.vx=-orange.set_vx;
+    orange.vy=0;
+  } else if (orange.px==centroX(8) && (orange.py>centroY(6))&& (orange.py>centroY(9))) {// ^
+    orange.vx=0;
+    orange.vy=-orange.set_vy;
+  }
 
 
-   // blue ghost
-    if (blue.py>centroY(8) && (blue.px==centroX(1))) {// ^
-      blue.vx=0;
-      blue.vy=-blue.set_vy;
-    } else if (blue.py==centroY(8) && (blue.px<centroX(2))) {// >
-      blue.vx=blue.set_vx;
-      blue.vy=0;
-    } else if (blue.px==centroX(2) && (blue.py>centroY(5))&& (blue.py<centroY(9))) {// ^
-      blue.vx=0;
-      blue.vy=-blue.set_vy;
-    } else if (blue.py==centroY(5) && (blue.px<centroX(6))) {// >
-      blue.vx=blue.set_vx;
-      blue.vy=0;
-    } else if ((blue.px==centroX(6)) && (blue.py<centroY(10))) {// v
-      blue.vx=0;
-      blue.vy=blue.set_vy;
-    } else if ((blue.py==centroY(10))&&(blue.px>centroX(1))) {// <
-      blue.vx=-blue.set_vx;
-      blue.vy=0;
-    }
+  // blue ghost
+  if (blue.py>centroY(8) && (blue.px==centroX(1))) {// ^
+    blue.vx=0;
+    blue.vy=-blue.set_vy;
+  } else if (blue.py==centroY(8) && (blue.px<centroX(2))) {// >
+    blue.vx=blue.set_vx;
+    blue.vy=0;
+  } else if (blue.px==centroX(2) && (blue.py>centroY(5))&& (blue.py<centroY(9))) {// ^
+    blue.vx=0;
+    blue.vy=-blue.set_vy;
+  } else if (blue.py==centroY(5) && (blue.px<centroX(6))) {// >
+    blue.vx=blue.set_vx;
+    blue.vy=0;
+  } else if ((blue.px==centroX(6)) && (blue.py<centroY(10))) {// v
+    blue.vx=0;
+    blue.vy=blue.set_vy;
+  } else if ((blue.py==centroY(10))&&(blue.px>centroX(1))) {// <
+    blue.vx=-blue.set_vx;
+    blue.vy=0;
+  }
 
   //Deteca colisões entre os fantasmas e o Pacman
-  if (dist(px_pac,py_pac,red.px,red.py)<10)
+  if (dist(px_pac, py_pac, red.px, red.py)<10)
     detectedColision=1;
-  else if (dist(px_pac,py_pac,pink.px,pink.py)<10)
+  else if (dist(px_pac, py_pac, pink.px, pink.py)<10)
     detectedColision=1;
-  else if (dist(px_pac,py_pac,orange.px,orange.py)<10)
+  else if (dist(px_pac, py_pac, orange.px, orange.py)<10)
     detectedColision=1;
-  else if (dist(px_pac,py_pac,blue.px,blue.py)<10)
+  else if (dist(px_pac, py_pac, blue.px, blue.py)<10)
     detectedColision=1;
   else {
     detectedColision=0;
@@ -904,7 +912,7 @@ void keyPressed() {
   }
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------
-//Função que roda pacman
+//Funçõe que rodam o Pacman
 float rotatePacmanStop() {
   if ( keyCode == LEFT ) {
     return radians(135);
@@ -945,7 +953,7 @@ float rotatePacmanStart() {
   }
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------
-//preenche o array com "2" nas coordenadas por onde o pac passou, o que vai impedir de serem desenhadas bolas neste sitio
+//Função que preenche o array com "2" nas coordenadas por onde o pac passou, o que vai impedir de serem desenhadas bolas neste sitio
 void caminhoPac() {
   for (int i=1; i<=nCol; i++) {
     for (int j=1; j<=nLin; j++) {
@@ -956,7 +964,7 @@ void caminhoPac() {
   }
 }
 //------------------------------------------------------------------------------------
-//Funções que desenham os labirintos para o modo Single Player (SP) e Multi Player (MP)
+//Funções que desenham os labirintos para o modo Singleplayer (SP) e Multi Player (MP)
 void desenharLabirintoSP () {
 
   //Desenha a fronteira da área de jogo
@@ -992,7 +1000,6 @@ void desenharLabirintoSP () {
 }
 
 void desenharLabirintoMP () {
-
   //Desenha a fronteira da área de jogo
   fill(0);
   stroke(corObstaculos);
@@ -1000,7 +1007,7 @@ void desenharLabirintoMP () {
   rect(margemH, margemV, width - 2*margemH, height - 2*margemV);
 
   //Desenha obstáculos
-  desenharObstaculo(2, 2, 1, 2); // A
+  desenharObstaculo(2, 2, 1, 1); // A
   desenharObstaculo(2, 2, 1, 1); // B
   desenharObstaculo(2, 9, 1, 1);//C
   desenharObstaculo(4, 4, 2, 1);//D
@@ -1012,7 +1019,8 @@ void desenharLabirintoMP () {
   desenharObstaculo(10, 7, 2, 1);//J
   desenharObstaculo(13, 2, 1, 1);//K
   desenharObstaculo(13, 9, 1, 1);//L
-  desenharObstaculo(14, 5, 1, 2);//M
+  desenharObstaculo(13, 5, 1, 2);//M
+  desenharObstaculo(13, 7, 2, 1);
   //desenharObstaculo(2, 4, 1, nLin-4);
   //desenharObstaculo(5, 4, nCol-4, nLin-4);
 }
@@ -1032,22 +1040,6 @@ void desenharObstaculo (int x, int y, int numC, int numL) {
   rect(x0, y0, larg, comp);
 }
 //-----------------------------------------------------------------------------------
-void initArray () {
-  float cx, cy;
-
-  // Insere um ponto nas células vazias
-  for (int i=1; i<=nCol; i++) {
-    for (int j=1; j<=nLin; j++) {
-      cx = centroX(i);
-      cy = centroY(j);
-      color c = get((int)cx, (int)cy);
-      if ((c != corObstaculos)) { //impedir que as bolas sejam desenhadas nos obstaculos e em sitios onde o pac passou
-        comida[i-1][j-1]=1;
-      }
-    }
-  }
-}
-
 //Função que desenha pontos
 /* Desenhar pontos nas células vazias (que não fazem parte de um obstáculo).
  * Esta função usa a cor de fundo no ecrã para determinar se uma célula está vazia ou se faz parte de um obstáculo.
@@ -1074,10 +1066,10 @@ int desenharPontos() {
       }
     }
   }
-  return drawn_points;
+  return drawn_points;                                    //Devolve quantos pontos são desenhados
 }
 //-----------------------------------------------------------------------------------
-//Função que inicializa/preenche o array com as coordenadas da comida
+//Função que inicializa/preenche o array com as coordenadas da comida (ie pontos)
 void arrayComida() {
   for (int i=1; i<=nCol; i++) {
     for (int j=1; j<=nLin; j++) {
@@ -1120,6 +1112,7 @@ void drawSpecialPoint () {
   drawnSpecialPoint=true;
 }
 
+//Função que detecta colisão do Pacman com o ponto especial
 void detectSpecialPoint () {
   if (drawnSpecialPoint==true) {
     if ( px_pac==centroX(px_specialpoint) && py_pac==centroY(py_specialpoint) ) {
@@ -1128,15 +1121,19 @@ void detectSpecialPoint () {
       fill(232, 239, 40);
       ellipse(centroX(px_specialpoint), centroY(py_specialpoint), pRaio/4, pRaio/4);
 
+      //Evidencia visualmente que o ponto foi comido
       int radiation=2;
-      do{noFill();
+      do{
+        noFill();
         stroke(#ff0000);
         ellipse(centroX(px_specialpoint), centroY(py_specialpoint), pRaio*radiation, pRaio*radiation);
         radiation+=4;
-        ghost_dead=true;
-      }while(radiation<42);
+      }while(radiation<60);
 
+      //Mata os fantasmas
       ghost_dead=true;
+
+      //Termina o jogo
       gamestate=5;
       win=1;
     }
@@ -1145,7 +1142,8 @@ void detectSpecialPoint () {
 
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Funções para Pontuações
-//Função que obtém pontuações (do Single Player - 1, do Mulitplayer - 2) de um ficheiro
+
+//Função que obtém pontuações (do Singleplayer - 1, do Mulitplayer - 2) de um ficheiro
 int[] readScores_File (int n, int j) throws IOException {
 
   //Decide qual o nome do ficheiro a ler
@@ -1195,7 +1193,7 @@ int[] readScores_File (int n, int j) throws IOException {
   return array;
 }
 
-//Função que imprime 1 pontuação (do Single Player - 1, do Multiplayer - 2) num ficheiro
+//Função que imprime 1 pontuação (do Singleplayer - 1, do Multiplayer - 2) num ficheiro
 void saveScores_File (int num, int n) throws IOException {
   //Decide qual o nome do ficheiro a ler
   String path = "";
@@ -1218,7 +1216,9 @@ void saveScores_File (int num, int n) throws IOException {
   out.close();
 }
 
-//Ordena por ordem decrescente os valores de uma array. Também teria sido possível utilizar a função sort() para ordenar e reverse() para inverter a ordem
+//Função que ordena por ordem decrescente os valores de uma array.
+/* Também teria sido possível utilizar a função sort() para ordenar e reverse() para inverter a ordem
+ */
 void orderArray (int[] array) {
   int temp, u=0;
   do {
