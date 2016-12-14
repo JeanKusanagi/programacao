@@ -1,0 +1,11 @@
+COMO UTILIZAR
+>	Para executar o jogo:
+Windows: Abrir app\win32\pacman.exe
+Linux:	 Abrir terminal na pasta app/linux e executar o comando ./pacman
+
+>	Para ver o código fonte JAVA:
+Abrir pacman\build\source\pacman.java
+
+>	Para ver o código fonte na IDE do Processing:
+Abrir pacman\pacman.pde
+Para executar o ficheiro pacman.pde na IDE do Processing é necessário adicionar a biblioteca Minim.

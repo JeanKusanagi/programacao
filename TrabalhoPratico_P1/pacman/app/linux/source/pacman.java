@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class pacman extends PApplet {
 
-/* Maria Jo\u00e3o Lavoura N. Mec. 84681
+/* Maria Lavoura N. Mec. 84681
  * Pedro Teixeira N. Mec. 84715
  *
  * Programa\u00e7\u00e3o I | Trabalho Pr\u00e1tico
@@ -45,7 +45,7 @@ String font="LithosPro-Black.otf";              //Fonte da UI
 float px_pac, py_pac, pRaio;                    //Posi\u00e7\u00e3o
 float vx_pac, vy_pac;                           //Velocidade
 int dir;                                        //Direc\u00e7\u00e3o e sentido do Pacman (modo multijogador)
-                                                //Evita que o Pacman volte \u00e0 sua rota\u00e7\u00e3o original quando o fantasma move-se 
+                                                //Evita que o Pacman volte \u00e0 sua rota\u00e7\u00e3o original quando o fantasma move-se
 
 //Inicializa\u00e7\u00e3o dos fantasmas
 Ghost red=new Ghost();
@@ -100,7 +100,7 @@ boolean ghost_dead;                           //O ponto foi comido -- os fantasm
 public void setup() {
   println("Trabalho Pratico de Programacao I : Pacman Multijogador");
   println("DETI - UA");
-  println("Maria Joao Lavoura, N. Mec. 84681");
+  println("Maria Lavoura, N. Mec. 84681");
   println("Pedro Teixeira, N. Mec. 84715");
   println("Jogo Iniciado");
   println(" ");
@@ -108,7 +108,7 @@ public void setup() {
   //Tamanho, t\u00edtulo e \u00edcone da janela
   
   background(0);
-  surface.setTitle("Pacman Multijogador | Maria Jo\u00e3o Lavoura | Pedro Teixeira");
+  surface.setTitle("Pacman Multijogador | Maria Lavoura | Pedro Teixeira");
   PImage icon = loadImage(dataPath("icon.png"));
   surface.setIcon(icon);
 
@@ -538,7 +538,7 @@ public void showHelp() {
 
   textSize(10);
   textAlign(CENTER);
-  text("Autores: Maria Jo\u00e3o Lavoura | Pedro Veloso Teixeira", (width/2), 500);
+  text("Autores: Maria Lavoura | Pedro Veloso Teixeira", (width/2), 500);
 
   /* Texto: setas direcionais
    * necess\u00e1rio utilizar outra fonte pois LithosPro-Black n\u00e3o possui estes caracteres) */

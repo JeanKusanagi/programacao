@@ -18,7 +18,7 @@ import java.io.IOException;
 
 public class pacman extends PApplet {
 
-/* Maria Jo\u00e3o Lavoura N. Mec. 84681
+/* Maria Lavoura N. Mec. 84681
  * Pedro Teixeira N. Mec. 84715
  *
  * Programa\u00e7\u00e3o I | Trabalho Pr\u00e1tico
@@ -44,6 +44,8 @@ String font="LithosPro-Black.otf";              //Fonte da UI
 //Par\u00e2metros do Pacman
 float px_pac, py_pac, pRaio;                    //Posi\u00e7\u00e3o
 float vx_pac, vy_pac;                           //Velocidade
+int dir;                                        //Direc\u00e7\u00e3o e sentido do Pacman (modo multijogador)
+                                                //Evita que o Pacman volte \u00e0 sua rota\u00e7\u00e3o original quando o fantasma move-se
 
 //Inicializa\u00e7\u00e3o dos fantasmas
 Ghost red=new Ghost();
@@ -98,7 +100,7 @@ boolean ghost_dead;                           //O ponto foi comido -- os fantasm
 public void setup() {
   println("Trabalho Pratico de Programacao I : Pacman Multijogador");
   println("DETI - UA");
-  println("Maria Joao Lavoura, N. Mec. 84681");
+  println("Maria Lavoura, N. Mec. 84681");
   println("Pedro Teixeira, N. Mec. 84715");
   println("Jogo Iniciado");
   println(" ");
@@ -106,7 +108,7 @@ public void setup() {
   //Tamanho, t\u00edtulo e \u00edcone da janela
   
   background(0);
-  surface.setTitle("Pacman | Maria Jo\u00e3o Lavoura | Pedro Teixeira");
+  surface.setTitle("Pacman Multijogador | Maria Lavoura | Pedro Teixeira");
   PImage icon = loadImage(dataPath("icon.png"));
   surface.setIcon(icon);
 
@@ -825,6 +827,8 @@ public void keyPressed() {
     if (px_pac < centroX(1)) { //impede pacman sair da janela
       px_pac = px_pac + 50;
     }
+
+    dir=1;
   }
   //----------------------------------------------
   //Right Arrow Key
@@ -840,6 +844,8 @@ public void keyPressed() {
     if (px_pac > centroX(nCol)) {
       px_pac = px_pac - 50;
     }
+
+    dir=2;
   }
   //----------------------------------------------
   //Up Arrow Key
@@ -855,6 +861,9 @@ public void keyPressed() {
     if (py_pac < centroY(1)) {
       py_pac = py_pac + 50;
     }
+
+    dir=3;
+
   }
   //----------------------------------------------
   //Down Arrow Key
@@ -870,6 +879,8 @@ public void keyPressed() {
     if (py_pac > centroY(nLin)) {
       py_pac = py_pac - 50;
     }
+
+    dir=4;
   }
   //------------------------------------------------------------------------------------------------------------
   //Detecta colis\u00f5es
@@ -936,18 +947,18 @@ public void keyPressed() {
   }
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------
-//Fun\u00e7\u00f5e que rodam o Pacman
+//Fun\u00e7\u00f5es que rodam o Pacman
 public float rotatePacmanStop() {
-  if ( keyCode == LEFT ) {
+  if (dir==1) {
     return radians(135);
   } else {
-    if ( keyCode == RIGHT ) {
+    if (dir==2) {
       return radians(315);
     } else {
-      if ( keyCode == UP ) {
+      if (dir==3) {
         return radians(225);
       } else {
-        if ( keyCode == DOWN ) {
+        if (dir==4) {
           return radians(45);
         } else {
           return radians(315);
@@ -958,16 +969,16 @@ public float rotatePacmanStop() {
 }
 
 public float rotatePacmanStart() {
-  if ( keyCode == LEFT ) {
+  if (dir==1) {
     return radians(-135);
   } else {
-    if ( keyCode == RIGHT ) {
+    if (dir==2) {
       return radians(45);
     } else {
-      if ( keyCode == UP ) {
+      if (dir==3) {
         return radians(-45);
       } else {
-        if ( keyCode == DOWN ) {
+        if (dir==4) {
           return radians(-225);
         } else {
           return radians(45);

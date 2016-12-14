@@ -1,4 +1,4 @@
-/* Maria João Lavoura N. Mec. 84681
+/* Maria Lavoura N. Mec. 84681
  * Pedro Teixeira N. Mec. 84715
  *
  * Programação I | Trabalho Prático
@@ -25,7 +25,7 @@ String font="LithosPro-Black.otf";              //Fonte da UI
 float px_pac, py_pac, pRaio;                    //Posição
 float vx_pac, vy_pac;                           //Velocidade
 int dir;                                        //Direcção e sentido do Pacman (modo multijogador)
-                                                //Evita que o Pacman volte à sua rotação original quando o fantasma move-se 
+                                                //Evita que o Pacman volte à sua rotação original quando o fantasma move-se
 
 //Inicialização dos fantasmas
 Ghost red=new Ghost();
@@ -80,7 +80,7 @@ boolean ghost_dead;                           //O ponto foi comido -- os fantasm
 void setup() {
   println("Trabalho Pratico de Programacao I : Pacman Multijogador");
   println("DETI - UA");
-  println("Maria Joao Lavoura, N. Mec. 84681");
+  println("Maria Lavoura, N. Mec. 84681");
   println("Pedro Teixeira, N. Mec. 84715");
   println("Jogo Iniciado");
   println(" ");
@@ -88,7 +88,7 @@ void setup() {
   //Tamanho, título e ícone da janela
   size(720, 520);
   background(0);
-  surface.setTitle("Pacman Multijogador | Maria João Lavoura | Pedro Teixeira");
+  surface.setTitle("Pacman Multijogador | Maria Lavoura | Pedro Teixeira");
   PImage icon = loadImage(dataPath("icon.png"));
   surface.setIcon(icon);
 
@@ -518,7 +518,7 @@ void showHelp() {
 
   textSize(10);
   textAlign(CENTER);
-  text("Autores: Maria João Lavoura | Pedro Veloso Teixeira", (width/2), 500);
+  text("Autores: Maria Lavoura | Pedro Veloso Teixeira", (width/2), 500);
 
   /* Texto: setas direcionais
    * necessário utilizar outra fonte pois LithosPro-Black não possui estes caracteres) */
