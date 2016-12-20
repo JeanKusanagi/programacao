@@ -5,4 +5,5 @@
 .classpath
 .project
 /bin/
-/TrabalhoPratico_P1/Old
+/TrabalhoPratico_P1/Arquivos
+/TrabalhoPratico_P1/pacman/app/win32/data/*.txt

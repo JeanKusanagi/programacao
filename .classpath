@@ -6,7 +6,10 @@
 	<classpathentry kind="src" path="Guiao 4"/>
 	<classpathentry kind="src" path="Guiao 5"/>
 	<classpathentry kind="src" path="Guiao 6"/>
+	<classpathentry kind="src" path="Guiao 7"/>
 	<classpathentry kind="src" path="Guiao 9"/>
+	<classpathentry kind="src" path="Guiao 10"/>
+	<classpathentry kind="src" path="Guiao 8"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
