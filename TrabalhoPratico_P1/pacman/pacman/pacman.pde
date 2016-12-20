@@ -65,7 +65,7 @@ int factor=100;                               //Quanto vale cada ponto em termos
 int scores1[]=new int[10];                    //Array de inteiros com as pontuações para o modo Single Player
 int scores2[]=new int[10];                    //Array de inteiros com as pontuações para o modo Multi Player
 int num_scores=8;                             //Número de pontuações máximas a apresentar
-boolean called_saveScores=true;
+boolean called_saveScores;
 
 //Ponto especial
 boolean blinker;                              //Permite tornar o ponto intermitente
@@ -169,6 +169,9 @@ void setup() {
   //Ponto especial
   drawnSpecialPoint=false;
   ghost_dead=false;
+
+  //Pontuações
+  called_saveScores=true;
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Função que executa os diferentes modos do jogo (0: Menu, 1: Jogo Single Player, 2: Jogo Multiplayer, 3: Pontuações, 4: Ajuda, 5: Gameover)

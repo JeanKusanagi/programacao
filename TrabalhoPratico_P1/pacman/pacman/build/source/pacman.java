@@ -85,7 +85,7 @@ int factor=100;                               //Quanto vale cada ponto em termos
 int scores1[]=new int[10];                    //Array de inteiros com as pontua\u00e7\u00f5es para o modo Single Player
 int scores2[]=new int[10];                    //Array de inteiros com as pontua\u00e7\u00f5es para o modo Multi Player
 int num_scores=8;                             //N\u00famero de pontua\u00e7\u00f5es m\u00e1ximas a apresentar
-boolean called_saveScores=true;
+boolean called_saveScores;
 
 //Ponto especial
 boolean blinker;                              //Permite tornar o ponto intermitente
@@ -189,6 +189,9 @@ public void setup() {
   //Ponto especial
   drawnSpecialPoint=false;
   ghost_dead=false;
+
+  //Pontua\u00e7\u00f5es
+  called_saveScores=true;
 }
 //-----------------------------------------------------------------------------------------------------------------------------------------
 //Fun\u00e7\u00e3o que executa os diferentes modos do jogo (0: Menu, 1: Jogo Single Player, 2: Jogo Multiplayer, 3: Pontua\u00e7\u00f5es, 4: Ajuda, 5: Gameover)
@@ -538,7 +541,7 @@ public void showHelp() {
 
   textSize(10);
   textAlign(CENTER);
-  text("Autores: Maria Jo\u00e3o Lavoura | Pedro Veloso Teixeira", (width/2), 500);
+  text("Autores: Maria Lavoura | Pedro Veloso Teixeira", (width/2), 500);
 
   /* Texto: setas direcionais
    * necess\u00e1rio utilizar outra fonte pois LithosPro-Black n\u00e3o possui estes caracteres) */
