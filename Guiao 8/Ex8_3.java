@@ -1,5 +1,5 @@
 /*
- * Ex8_2.java
+ * Ex8_3.java
  * 
  * Copyright 2016 Pedro <Pedro@UA>
  * 
@@ -20,40 +20,55 @@
  * 
  */
 import java.util.Scanner; 
-public class Ex8_2 {
+public class Ex8_3 {
 
 	static Scanner ler=new Scanner (System.in);
 
 	public static void main (String[] args) {
 		//UI inicial
-		System.out.printf("Criação de acrónimos\n------------------------\n");
+		System.out.printf("'Contador' de palavras\n------------------------\n");
 		
 		String frase=null;
 		
 		do {
 			//Leitura da frase
-			System.out.printf("\nNome de entrada -> ");
+			System.out.printf("\nFrase de entrada -> ");
 			frase=ler.nextLine();
 			
 			//Obtenção do acrónimo
-			String acronym=getAcronym(frase);
+			int count=getWordCount(frase);
 			
 			//Impressão do resultado
-			System.out.printf("Acrónimo -> %s\n", acronym);
+			System.out.printf("Número de palavras na frase -> %d\n", count);
 		} while (frase!=null);
 		
 	}
 
 	//Função que devolve um acrónimo para um dado nome
-	public static String getAcronym (String frase) {
-		String ac= "";		//String com o acrónimo
-
-		//Para cada carácter da frase
+	public static int getWordCount (String frase) {
+		int count=0;
+		boolean in_word=false; 	
+		
+		//Percorrer a String caracter a caracter
 		for (int i=0; i<frase.length(); i++) {
+			
 			char tmp=frase.charAt(i);
-			//Se for uma maíscula, o carácter é adicionado à String ac  
-			if (Character.isUpperCase(tmp)) ac=ac+tmp;
+			
+			//Se estiver “dentro” de uma palavra e aparecer um espaço (ou \t ou \n), passa a estar “fora”
+			if (in_word) {
+				if ((tmp=='\t') || (tmp=='\n') || (tmp==' ')) 
+					in_word=false; 
+			}
+			
+			//Se estiver “fora” e aparecer outro caráter, passa a estar “dentro” e conta mais uma palavra.
+			else if(!in_word) {
+				if ((tmp!='\t') && (tmp!='\n') && (tmp!=' ')) {
+					in_word=true; 
+					count++;
+				}	
+			}
+			
 		}
-		return ac;
+		return count;
 	}
 }
