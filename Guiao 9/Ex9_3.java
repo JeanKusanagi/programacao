@@ -304,7 +304,7 @@ public class Ex9_3 {
 		}
 
 		//Adiciona números ao ficheiro dados.txt
-		int j=0;				//Conta quantos números são inseridos
+		int j=array.length;				//Conta quantos números são inseridos
 		int num=1; 				//Variável temporária com número a ser lido
 		System.out.printf("\nIntroduza os numeros que deseja adicionar (0 termina): ");
 		
