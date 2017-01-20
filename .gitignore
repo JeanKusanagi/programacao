@@ -1,9 +1,12 @@
-/bin/
-/Guiao 9/tmp
-/.settings/
-.checkstyle
-.classpath
-.project
-/bin/
 /TrabalhoPratico_P1/Arquivos
 /TrabalhoPratico_P1/pacman/app/win32/data/*.txt
+/Eclipse/
+/Books/
+/P1/.classpath
+/P1/.checkstyle
+/P1/bin
+/P1/.project
+/P2/.classpath
+/P2/.checkstyle
+/P2/bin
+/P2/.project
