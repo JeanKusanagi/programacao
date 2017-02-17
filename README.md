@@ -9,4 +9,4 @@ Pedro Teixeira
 ----------------
 Este repositório contém exercícios das seguintes disciplinas:
 Programação 1 2016-2017
-Programaçaõ 2 2017
+Programação 2 2017
