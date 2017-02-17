@@ -26,7 +26,6 @@ public class Ex01_1 {
 		if (!op.equals("+") && !op.equals("-") && !op.equals("*") && !op.equals("/")) System.err.printf("\nOperação Inválida");
 		else {
 			double num2=read.nextDouble();
-		
 			//Executar operação
 			double res=0;
 			switch (op) {
@@ -47,10 +46,6 @@ public class Ex01_1 {
 			//Imprimir operação
 			System.out.printf("%f %s %f = %f", num1, op, num2, res);
 		}
-		
-		
-		
-	
 	}
 
 }

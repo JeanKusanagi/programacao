@@ -7,37 +7,36 @@
  */
 
 import java.util.Scanner;
+import static java.lang.System.*;
 
-public class Ex01_3 {
+public class Ex01_3
+{
+	public static final Scanner in = new Scanner(System.in);
 
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
+		int n;
+		do
+		{
+			out.print("N: ");
+			n = in.nextInt();
+			if(n < 1)
+				err.println("ERROR: invalid number!");
+		}
+		while(n < 1);
 
-		//Leitura número
-		int n=getIntPos("Introduza um número inteiro positivo: ");
-
-		//Verificar se o número n é primo
-		boolean prime = false;
-
-		if (n==1) prime=false;                 
-		for(int i=2; i<n; i++) { 
-			if(n % i == 0) prime=false; 
-		} 
-		
-		if(prime) System.out.printf("O número %d é primo.", n); 
-		else System.out.printf("O número %d não é primo.", n);
-
+		String verb = isPrime(n)? "is" : "is not";
+		out.printf("Number %d %s prime\n", n, verb);
 	}
 
-
-	public static int getIntPos (String message)
+	public static boolean isPrime(int n)
 	{
-		Scanner ler = new Scanner(System.in);
-		System.out.printf("%s",message);
-		int n=ler.nextInt();
-		while (n<0) {
-			System.out.printf("\nTem de introduzir um numero inteiro POSITIVO: ");
-			n=ler.nextInt();
-		}
-		return n;
+		//for (int i = 2; i <= n/2; i++) {
+		for (int i = 2; i < Math.sqrt(n); i++) {
+			if ((n % i == 0)) {
+				return false;
+			}
+		}	
+		return true;
 	}
 }
