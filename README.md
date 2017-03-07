@@ -7,6 +7,4 @@ O código é fornecido tal como está e embora tenha sido testado, poderá apres
 Pedro Teixeira
 
 ----------------
-Este repositório contém exercícios das seguintes disciplinas:
-Programação 1 2016-2017
-Programação 2 2017
+Este repositório contém exercícios das seguintes disciplinas: Programação 1 2016-2017  Programação 2 2017
