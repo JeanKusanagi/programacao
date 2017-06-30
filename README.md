@@ -22,7 +22,7 @@ Programação 2 2017
   - Aula 10. Estruturas de Dados: Pilhas, Filas e Listas Bi-Ligadas (Stack, Queue, DoublyLinkedList)
   - Aula 11. Estruturas de Dados: Listas de pares chave-valor (KeyValueList)
   - Aula 12. Estruturas de Dados: Tabelas de Dispersão (HashTable)
-  - Aula 13. Estruturas de Dados: Árvores Binárias
+  - Aula 13. Estruturas de Dados: Árvores Binárias (BinarySearchTree)
 
 Programação 1 2016-2017
   - Aula 1. Introdução
