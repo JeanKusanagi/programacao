@@ -1,0 +1,10 @@
+﻿linha curta 1
+linha curta 2
+linha muuuuuuuuuuuuuuuuuuuuuuuuuuuuito longa 1
+linha muuuuuuuuuuuuuuuuuuuuuuuuuuuuito longa 2
+linha muuuuuuuuuuuuuuuuuuuuuuuuuuuuito longa 3
+linha curta 4
+linha muuuuuuuuuuuuuuuuuuuuuuuuuuuuito longa 4
+linha curta 5
+linha muuuuuuuuuuuuuuuuuuuuuuuuuuuuito longa 5
+linha muuuuuuuuuuuuuuuuuuuuuuuuuuuuito longa 6

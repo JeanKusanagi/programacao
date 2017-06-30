@@ -1,0 +1,23 @@
+﻿Exerc�icio 5.1
+Altere o programa 4.2 da aula anterior por forma a torn�a-lo totalmente robusto. Em
+particular, o programa deve garantir a sanidade dos argumentos e dos valores introduzidos
+pelo utilizador.
+Exerc�icio 5.2
+Crie um programa que copie um ficheiro de texto. Os nomes dos dois ficheiros envolvidos
+devem ser dados como argumentos na linha de comandos.1 Por exemplo, java -ea p52
+Texto1.txt Texto2.txt deve criar um ficheiro Texto2.txt com um conte�udo igual ao
+do ficheiro Texto1.txt. Se Texto2.txt j�a existir, deve perguntar ao utilizador se deseja
+reescrever o seu conte�udo.
+O programa deve ser robusto. Deve detetar falhas e apresentar mensagens de erro
+apropriadas. V�arias condi�c�oes t�em de estar reunidas para que o programa funcione. O
+ficheiro original tem de existir, tem de ser um ficheiro normal e o utilizador tem de ter
+permiss�ao para o ler. Se o ficheiro de destino existir, tem de ter permiss�ao de escrita.
+Se n�ao existir, ent�ao tem de ter permiss�ao de escrita no diret�orio pai. Mesmo assim,
+podem ocorrer falhas imprevis�iveis, como erros no disco ou de comunica�c�ao, que devem ser
+reportadas.
+Exerc�icio 5.3
+Crie um programa que apresente alguma informa�c�ao sobre os ficheiros existentes num determinado
+direct�orio. O nome do direct�orio �e passado como argumento do programa.
+Se for chamado sem argumentos, o programa deve considerar o direct�orio actual (.).
+Para cada ficheiro, deve ser indicado se o mesmo corresponde a um direct�orio (DIR) e
+se tem permiss�ao de leitura (READ) ou de escrita (WRITE), como se v�e no exemplo abaixo.
