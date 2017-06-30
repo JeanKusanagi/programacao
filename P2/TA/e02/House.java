@@ -44,7 +44,11 @@ public class House {
 	public Room room(int i) {
 		return rooms[i];
 	}
-
+	
+	public String houseType() {
+		return this.houseType;
+	}
+	
 	// Public Methods 
 	public int addRoom(Room r) {
 		if (size == rooms.length) {

@@ -23,7 +23,7 @@ public class Door {
    }
    
    public int id2(){
-	   return this.id1;
+	   return this.id2;
    }
 }
 
