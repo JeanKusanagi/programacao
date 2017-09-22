@@ -74,7 +74,6 @@ public class Main {
 						// Print
 					case 3:
 						System.out.println(list);
-						list.print();
 						break;
 
 						// Order

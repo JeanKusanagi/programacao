@@ -64,5 +64,21 @@ public class Pessoa {
 		
 		return builder.toString();
 	}
+
+	
+	// Setters
+	/**
+	 * @param nome the nome to set
+	 */
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+
+	/**
+	 * @param dataNasc the dataNasc to set
+	 */
+	public void setDataNasc(Data dataNasc) {
+		this.dataNasc = dataNasc;
+	}
 	
 }

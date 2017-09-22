@@ -11,5 +11,6 @@ public class Test {
 		Data d = new Data(11, 4, 1974);
 		Pessoa p = new Pessoa ("António Nunes", 98012244, d);
 		System.out.print(d + "\n" + p);
+		
 	}
 }

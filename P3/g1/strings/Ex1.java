@@ -16,14 +16,28 @@ public class Ex1 {
 		// Read String
 		Scanner sc = new Scanner (System.in);
 		String s = sc.nextLine();
-		
-		
+
+
 		System.out.println("Only upper case: " + onlyUpperCase(s));
 		System.out.println("Only lower case: " + onlyLowerCase(s));
 		words(s);
 		System.out.println("Switched chars 2 by 2: " + switchChars(s));
 	}
-
+	
+	// Total number of numeric digits
+	/**
+	 * Counts the number of occurrences of digits in the String.
+	 * @param s String to analyze
+	 * @return a non-negative integer number representing the number of occurrences of digits in the String.
+	 */
+	public static int countDigits (String s) {
+		int count = 0;
+		for (int i = 0; i < s.length(); i++) {
+			if (Character.isDigit(s.charAt(i))) count++;
+		}
+		return count;
+	}
+	
 	// Only uppercase?
 	/**
 	 *  
@@ -33,7 +47,7 @@ public class Ex1 {
 	public static boolean onlyUpperCase (String s) {
 		return s.toUpperCase().equals(s);
 	}
-	
+
 	// Only lowercase?
 	/**
 	 *  
@@ -43,7 +57,7 @@ public class Ex1 {
 	public static boolean onlyLowerCase (String s) {
 		return s.toLowerCase().equals(s);
 	}
-	
+
 	// Total of words
 	/**
 	 * Counts the number of words and prints the said words
@@ -56,7 +70,7 @@ public class Ex1 {
 			System.out.println("\t" + w);
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param s
@@ -64,13 +78,13 @@ public class Ex1 {
 	 */
 	public static String switchChars (String s) {
 		StringBuilder n = new StringBuilder();
-		
+
 		int length = s.length();
 		for (int i = 0; i < length - 1; i = i + 2) {
 			n.append(s.charAt(i + 1));
 			n.append(s.charAt(i));
 		}
-		
+
 		if (length % 2 != 0) n.append(s.charAt(length-1));		// strings with an odd-length must have the last char added 
 		return n.toString(); 
 	}
