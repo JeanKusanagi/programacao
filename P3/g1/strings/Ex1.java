@@ -17,7 +17,7 @@ public class Ex1 {
 		Scanner sc = new Scanner (System.in);
 		String s = sc.nextLine();
 
-
+		System.out.println("Count Digits: " + countDigits(s));
 		System.out.println("Only upper case: " + onlyUpperCase(s));
 		System.out.println("Only lower case: " + onlyLowerCase(s));
 		words(s);
