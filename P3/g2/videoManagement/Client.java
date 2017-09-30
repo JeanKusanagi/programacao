@@ -1,21 +1,22 @@
 package g2.videoManagement;
-import g1.people.Pessoa;
 import g1.people.Data;
+import g1.people.Pessoa;
 
 /**
  * Client
  * 
  * @author Pedro Teixeira, 84715, MIECT
  */
+
 public class Client extends Pessoa {
 
 	// Static Fields
 	private static int nextID = 0;
-	
+
 	// Instance Fields
 	private int id;
 	private Data enrollDate;
-	
+
 	// Constructor
 	/**
 	 * Constructor
@@ -26,7 +27,7 @@ public class Client extends Pessoa {
 		id = nextID;
 		this.enrollDate = enrollDate;
 	}
-	
+
 	// ---------------------------
 	// Getters
 	/**
@@ -42,7 +43,7 @@ public class Client extends Pessoa {
 	public Data getEnrollDate() {
 		return enrollDate;
 	}
-	
+
 	@Override
 	public String toString () {
 		StringBuilder e = new StringBuilder();
