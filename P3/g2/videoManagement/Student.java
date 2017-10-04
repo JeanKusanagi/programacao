@@ -8,11 +8,11 @@ import g1.people.Data;
  */
 
 public class Student extends Client {
-	
+
 	// Instance Fields
 	private int    numMec;
 	private String course;
-	
+
 	// Constructor
 	/**
 	 * 
@@ -56,7 +56,7 @@ public class Student extends Client {
 		s.append(course);
 		return super.toString() + s.toString();
 	}
-	
+
 	// ---------------------------
 	// Setters
 	/**

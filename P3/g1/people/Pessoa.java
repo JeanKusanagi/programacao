@@ -1,7 +1,7 @@
 package g1.people;
 
 /**
- * Pessoa
+ * Person
  * 
  * @author Pedro Teixeira 84715
  */
@@ -12,7 +12,7 @@ public class Pessoa {
 	private String nome;
 	private int cc;
 	private Data dataNasc;
-	
+
 	// Constructor
 	/**
 	 * 
@@ -25,7 +25,7 @@ public class Pessoa {
 		this.cc   = cc;
 		this.dataNasc = dataNasc;
 	}
-	
+
 	// Getters
 	/**
 	 * @return the nome
@@ -47,25 +47,25 @@ public class Pessoa {
 	public Data getDataNasc() {
 		return dataNasc;
 	}
-	
+
 	@Override
 	public String toString() {
 		// Used StringBuilder to create the String more effiently (ie without using 
 		// concatenation, which means creating several "auxiliary" Strings)
 		StringBuilder builder = new StringBuilder();
-		
+
 		builder.append(nome);
-		
+
 		builder.append(", CC Card Number ");
 		builder.append(cc);
-		
+
 		builder.append(", born in ");
 		builder.append(dataNasc);
-		
+
 		return builder.toString();
 	}
 
-	
+
 	// Setters
 	/**
 	 * @param nome the nome to set
@@ -80,5 +80,5 @@ public class Pessoa {
 	public void setDataNasc(Data dataNasc) {
 		this.dataNasc = dataNasc;
 	}
-	
+
 }

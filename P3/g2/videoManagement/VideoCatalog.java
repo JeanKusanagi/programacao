@@ -45,7 +45,7 @@ public class VideoCatalog {
 		if (!videos.containsKey(videoID)) return false;
 		return videos.get(videoID).isAvailable();
 	}
-	
+
 	/**
 	 * Returns the IDs of the videos loaned to the given user. 
 	 * @param clientID ID of the client
@@ -56,7 +56,7 @@ public class VideoCatalog {
 		LinkedList<Integer> loansByClientID = loansByClient.get(clientID);
 		return loansByClientID.toArray(new Integer[loansByClientID.size()]); 
 	}
-	
+
 	/**
 	 * Returns the IDs of the clients that the given video was loaned to. 
 	 * @param videoID ID of the video
@@ -67,7 +67,7 @@ public class VideoCatalog {
 		LinkedList<Integer> loansByVideoID = loansByClient.get(videoID);
 		return loansByVideoID.toArray(new Integer[loansByVideoID.size()]); 
 	}
-	
+
 	/**
 	 * Returns the list of videos (as an array), ordered by their ratings in ascending order.
 	 * @return an array of Video objects ordered by their ratings in ascending order. 
@@ -77,7 +77,7 @@ public class VideoCatalog {
 		sortByRating(videosByRating, 0, videosByRating.length);
 		return videosByRating;
 	}
-	
+
 	/**
 	 * Returns the list of videos (as an array).
 	 * @return an array of Video objects
@@ -85,7 +85,7 @@ public class VideoCatalog {
 	public Video[] getVideos() {
 		return videos.values().toArray(new Video[videos.size()]);
 	}
-	
+
 	/**
 	 * Searchs and returns, if existing, the first ocurrence of a video with a title containing the given String.
 	 * @param videoName String containing (part of) the title of the video.
@@ -96,7 +96,7 @@ public class VideoCatalog {
 			if (v.getTitle().contains(videoName)) return v;
 		return null;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
@@ -105,15 +105,15 @@ public class VideoCatalog {
 		s.append(" videos and ");
 		s.append(clients.size());
 		s.append(" clients.\nList of Videos:\n");
-		
+
 		// pretty-print of videos Map
 		for (Video v: videos.values()) {;
-			s.append(v);
-			s.append("\n");
+		s.append(v);
+		s.append("\n");
 		}
-		
+
 		s.append("\nList of Clients:\n");
-		
+
 		// pretty-print of clients Map
 		for (Client c: clients.values()) {
 			s.append(c);
@@ -131,7 +131,7 @@ public class VideoCatalog {
 	public void addClient(Client c) {
 		clients.put(c.getId(), c);
 	}
-	
+
 	/**
 	 * Removes a client represented by its ID.
 	 * @param id ID of the client to remove
@@ -145,7 +145,7 @@ public class VideoCatalog {
 		//no need to remove on the loansByVideo Map
 		return true;
 	}
-	
+
 	/**
 	 * Adds a Video.
 	 * @param v Video to add
@@ -153,7 +153,7 @@ public class VideoCatalog {
 	public void addVideo(Video v) {
 		videos.put(v.getId(), v);
 	}
-	
+
 	/**
 	 * Removes a video represented by its ID.
 	 * @param id ID of the video to remove
@@ -167,7 +167,7 @@ public class VideoCatalog {
 		//no need to remove on the loansByClient Map
 		return true;
 	}
-	
+
 	/**
 	 * Adds a loan represented by a pair {@code (clientID, videoID)}. 
 	 * A loan is possible when both the client and the video exist and when the user hasn't reached the quota limit 
@@ -179,7 +179,7 @@ public class VideoCatalog {
 	 */
 	public boolean addLoan(int clientID, int videoID) {
 		if (!videos.containsKey(videoID) || !clients.containsKey(clientID)) return false;
-		
+
 		// Update loansByClient
 		if (!loansByClient.containsKey(clientID)) {
 			loansByClient.put(clientID, new LinkedList<Integer>());
@@ -194,13 +194,13 @@ public class VideoCatalog {
 		}
 		LinkedList<Integer> clientsIDs = loansByVideo.get(videoID);
 		clientsIDs.addLast(clientID);
-		
+
 		// Update video availability
 		videos.get(videoID).setAvailable(false);
 
 		return true;
 	}
-	
+
 	/**
 	 * Removes a loan represented by a pair {@code (clientID, videoID)} and adds the user rating to the ratings (1-10) of the video.
 	 *
@@ -218,14 +218,14 @@ public class VideoCatalog {
 		// else
 
 		// No need to update loansByVideo nor loansByClient (thus keeping a history of loans)
-		
+
 		// Update video availability
 		videos.get(videoID).setAvailable(true);
-		
+
 		// Update video rating
 		Video v = videos.get(videoID);
 		v.addRating(rate);
-		
+
 		return true;
 	}
 
@@ -246,7 +246,7 @@ public class VideoCatalog {
 			}
 		}
 	}
-	
+
 	/**
 	 * Swaps two elements of an array of type T.
 	 * @param a the array
@@ -258,5 +258,5 @@ public class VideoCatalog {
 		a[i] = a[j];
 		a[j] = temp;
 	}
-	
+
 }

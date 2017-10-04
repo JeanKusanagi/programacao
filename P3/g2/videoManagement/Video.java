@@ -6,17 +6,17 @@ package g2.videoManagement;
  * @author Pedro Teixeira, 84715, MIECT
  */
 public class Video {
-	
+
 	// Static Fields
 	private static int nextID = 0;
-	
+
 	// Instance Fields
 	private int id;
 	private String title, category;
 	private Age age;
 	private boolean available;
 	private int totalRating, averageRating, numRatings;
-	
+
 	// -------------------------------------
 	// Instance Constructors
 	/**
@@ -37,10 +37,10 @@ public class Video {
 		averageRating = 0;
 		numRatings = 0;
 	}
-	
+
 	// -------------------------------------
 	// Non-Static Methods
-	
+
 	// Getters
 
 	/**
@@ -50,7 +50,7 @@ public class Video {
 		return id;
 	}
 
-	
+
 	/**
 	 * @return the title
 	 */
@@ -58,7 +58,7 @@ public class Video {
 		return title;
 	}
 
-	
+
 	/**
 	 * @return the category
 	 */
@@ -66,7 +66,7 @@ public class Video {
 		return category;
 	}
 
-	
+
 	/**
 	 * @return the age
 	 */
@@ -74,7 +74,7 @@ public class Video {
 		return age;
 	}
 
-	
+
 	/**
 	 * @return the available
 	 */
@@ -82,7 +82,7 @@ public class Video {
 		return available;
 	}
 
-	
+
 	/**
 	 * @return the averageRating
 	 */
@@ -102,9 +102,9 @@ public class Video {
 		s.append("\tAverage Rating: " + averageRating);
 		return s.toString();
 	}
-	
-	
-	
+
+
+
 	// -------------------------------------
 	// Setters
 	/**
@@ -114,7 +114,7 @@ public class Video {
 		this.category = category;
 	}
 
-	
+
 	/**
 	 * @param available the available to set
 	 */
@@ -122,7 +122,7 @@ public class Video {
 		this.available = available;
 	}
 
-	
+
 	/**
 	 * @param totalRating the totalRating to set
 	 */
@@ -131,5 +131,5 @@ public class Video {
 		numRatings++;
 		averageRating = totalRating / numRatings;
 	}
-	
+
 }

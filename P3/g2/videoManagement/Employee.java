@@ -11,7 +11,7 @@ public class Employee extends Client {
 
 	// Instance Fields
 	private int numEmpl, nif;
-	
+
 	// ---------------------------
 	// Constructor
 	/**
@@ -26,7 +26,7 @@ public class Employee extends Client {
 		this.numEmpl = numEmpl;
 		this.nif     = nif;
 	}
-	
+
 	// ---------------------------
 	// Getters
 	/**
@@ -42,7 +42,7 @@ public class Employee extends Client {
 	public int getNif() {
 		return nif;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder s = new StringBuilder();
