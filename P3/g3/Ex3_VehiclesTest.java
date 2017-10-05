@@ -51,7 +51,7 @@ public class Ex3_VehiclesTest {
 		System.out.println("-------");
 		Vehicle truck1 = new TruckGoods();
 		System.out.println(truck1.setGrossWeight(9)); 				// false
-		System.out.println(truck1.setCylinderCapacity(200));   		// true
+		System.out.println(truck1.setCylinderCapacity(200));   		// false
 		truck1.setCylinderCapacity(1000); 		
 		truck1.setPower(100); 					
 		truck1.setGrossWeight(35000);    		
