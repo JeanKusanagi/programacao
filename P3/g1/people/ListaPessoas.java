@@ -10,12 +10,12 @@ package g1.people;
  */
 
 public class ListaPessoas {
-	
+
 	// Instance Fields
 	private Pessoa[] list;
 	private int blockSize;
 	private int numPeople;
-	
+
 	// -------------------------------------
 	// Constructor
 	/**
@@ -27,7 +27,7 @@ public class ListaPessoas {
 		this.blockSize = blockSize;
 		numPeople = 0;
 	}
-	
+
 	// -------------------------------------
 	// Getters
 	@Override
@@ -38,9 +38,9 @@ public class ListaPessoas {
 			s.append(list[i]);
 		}
 		return s.toString();
-		
+
 	}
-	
+
 	// -------------------------------------
 	// Setters
 	/**
@@ -52,7 +52,7 @@ public class ListaPessoas {
 		list[numPeople] = p;
 		numPeople++;
 	}
-	
+
 	/**
 	 * Removes a person, identified by its CC Card Number, from the list
 	 * @param num
@@ -60,37 +60,37 @@ public class ListaPessoas {
 	 */
 	public boolean removePerson (int num) {
 		int index = searchPerson(num);
-		
+
 		// person not found
 		if (index == -1) return false;		
-			
+
 		// else
-		
+
 		// removes the person by eliminating the reference to the object
 		list[index] = null; 
-		
+
 		// pushes other people on the list so there's no null value in any index (smaller or equal to numPeople) of the list   
 		System.arraycopy(list, index+1, list, index, numPeople - index);	
-		
+
 		numPeople--;
-			
+
 		return true;
 	}
-	
+
 	/**
 	 * Orders the list by their CC Cards Number
 	 */
 	public void orderByNum () {
 		orderByNum(0, numPeople);
 	}
-	
+
 	/**
 	 * Orders the list by their names
 	 */
 	public void orderByName () {
 		orderByName(0, numPeople);
 	}
-	
+
 	// -------------------------------------
 	// Auxiliary Methods
 	/**
@@ -99,7 +99,7 @@ public class ListaPessoas {
 	private boolean full() {
 		return numPeople == list.length;
 	}
-	
+
 	/**
 	 * Expands the list by blocks of blockSize dimension
 	 */
@@ -108,7 +108,7 @@ public class ListaPessoas {
 		Pessoa[] newList = new Pessoa[listLength + blockSize];
 		System.arraycopy(list, 0, newList, 0, listLength);
 	}
-	
+
 	/**
 	 * Searches for the first person identified by the CC Card num and returns its index
 	 * @param num CC Card Number of the person to be found
@@ -120,7 +120,7 @@ public class ListaPessoas {
 		}
 		return -1;
 	}
-	
+
 	/**
 	 * Bubble sort (based on the algorithm from P2)
 	 * Used Bubble sort under the assumption the list won't 
@@ -143,7 +143,7 @@ public class ListaPessoas {
 			j--;
 		} while (j>start+1 && existsSwap);
 	}
-	
+
 	/**
 	 * Bubble sort (from P2)
 	 */
@@ -163,7 +163,7 @@ public class ListaPessoas {
 			j--;
 		} while (j>start+1 && existsSwap);
 	}
-	
+
 	/**
 	 * (Based on P2)
 	 * Swaps two elements of an integer array.
