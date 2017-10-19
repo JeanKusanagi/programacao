@@ -26,7 +26,7 @@ public class Motorcycle extends VehicleMotor {
 	// Methods
 	@Override
 	public String toString() {
-		return "Motorcyle \n" + super.toString();
+		return "\nMotorcyle: " + super.toString();
 	}
 
 }

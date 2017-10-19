@@ -8,7 +8,6 @@ package g5.vehicles;
 
 public class LicensePlate {
 
-	// ----------------------------
 	// Instance Fields
 	private final String licensePlate;
 
@@ -19,10 +18,10 @@ public class LicensePlate {
 	 * Creates a License Plate. The given license plate must be valid. 
 	 * @see LicensePlate#isValid(String) 
 	 * @param licensePlate
-	 * @throws IllegalArgumentException if the argument is not valid
+	 * @throws IllegalArgumentException if the license plate is not valid
 	 */
 	public LicensePlate(String licensePlate) {
-		if (!LicensePlate.isValid(licensePlate)) throw new IllegalArgumentException();
+		if (!isValid(licensePlate)) throw new IllegalArgumentException();
 		this.licensePlate = licensePlate;
 	}
 
@@ -52,6 +51,12 @@ public class LicensePlate {
 		return  licensePlate.equalsIgnoreCase("Not Registered") || licensePlate.matches("\\d\\d-[A-Z][A-Z]-[A-Z][A-Z]") || licensePlate.matches("[A-Z][A-Z]-\\d\\d-[A-Z][A-Z]") || licensePlate.matches("[A-Z][A-Z]-[A-Z][A-Z]-\\d\\d");
 	}
 
+	/**
+	 * @return a License Plate for non-licensed vehicles ("Not Registered")
+	 */
+	public static LicensePlate noLicensePlate() {
+		return new LicensePlate("Not Registered");
+	}
 	// ----------------------------
 	// Methods
 	@Override

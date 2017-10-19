@@ -7,7 +7,16 @@ package g5.vehicles;
  */
 
 public interface Police {
+
+	/**
+	 * @return the type of the Police vehicle
+	 * @see PoliceType
+	 */
 	public PoliceType getType();
+
+	/**
+	 * @return the ID (String in the format {@code type of the Police Vehicle#ID number})
+	 */
 	public String getID();
 
 }

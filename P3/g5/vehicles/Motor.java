@@ -19,7 +19,8 @@ public class Motor {
 	 * @param cylinderCapacity (must be > 0)
 	 * @param power	(must be > 0)
 	 * @param consumption (must be > 0)
-	 * @param fuelType (must be a valid FuelType)
+	 * @param fuelType (FuelType enum)
+	 * @see FuelType
 	 * @throws IllegalArgumentException if the arguments are not valid
 	 */
 	public Motor (double cylinderCapacity, double power, double consumption, FuelType fuelType) {
@@ -27,7 +28,7 @@ public class Motor {
 		this.cylinderCapacity = cylinderCapacity;
 		this.power = power;
 		this.consumption = consumption;
-		if (!setFuelType(fuelType)) throw new IllegalArgumentException();
+		setFuelType(fuelType);
 	}
 
 	// ----------------------------
@@ -68,12 +69,10 @@ public class Motor {
 	/**
 	 * Sets a new fuel type
 	 * @param fuelType
-	 * @return {@code true} if the given fuel type exists and is set as the fuel type of the motor, else {@code false} 
+	 * @see FuelType
 	 */
-	public boolean setFuelType(FuelType fuelType) {
-		boolean canChange = FuelType.exists(fuelType); 
-		if (canChange) this.fuelType = fuelType;
-		return canChange;
+	public void setFuelType(FuelType fuelType) {
+		this.fuelType = fuelType;
 	}
 
 	// ----------------------------
@@ -81,7 +80,7 @@ public class Motor {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("\n\tMotor\n\t\tCylinder Capacity: ");
+		builder.append("\n\tMotor:\n\t\tCylinder Capacity: ");
 		builder.append(cylinderCapacity);
 		builder.append("\n\t\tPower: ");
 		builder.append(power);

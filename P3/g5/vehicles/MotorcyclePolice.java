@@ -7,6 +7,7 @@ package g5.vehicles;
  */
 
 public class MotorcyclePolice extends Motorcycle implements Police {
+
 	// Static Fields
 	private static int nextID = 0;
 

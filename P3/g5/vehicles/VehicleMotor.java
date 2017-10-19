@@ -29,26 +29,40 @@ public abstract class VehicleMotor extends Vehicle {
 
 	// ----------------------------
 	// Getters
+	/**
+	 * @return the cylinderCapacity
+	 */
 	public double getCylinderCapacity() {
 		return motor.getCylinderCapacity();
 	}
 
+	/**
+	 * 
+	 * @return the power
+	 */
 	public double getPower() {
 		return motor.getPower();
 	}
 
+	/**
+	 * 
+	 * @return the consumption
+	 */
 	public double getConsumption() {
 		return motor.getConsumption();
 	}
 
+	/**
+	 * @return the fuelType
+	 */
 	public FuelType getFuelType() {
 		return motor.getFuelType();
 	}
 
 	// ----------------------------
 	// Setters
-	public boolean setFuelType(FuelType type) {
-		return motor.setFuelType(type);
+	public void setFuelType(FuelType type) {
+		motor.setFuelType(type);
 	}
 
 	// ----------------------------
@@ -57,7 +71,6 @@ public abstract class VehicleMotor extends Vehicle {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(super.toString());
-		builder.append("\n\tMotor:");
 		builder.append(motor);
 		return builder.toString();
 	}

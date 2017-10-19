@@ -26,7 +26,7 @@ public class Car extends VehicleMotor {
 	// Methods
 	@Override
 	public String toString() {
-		return "Car \n" + super.toString();
+		return "\nCar:" + super.toString();
 	}
 
 

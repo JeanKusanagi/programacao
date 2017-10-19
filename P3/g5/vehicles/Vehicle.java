@@ -29,7 +29,7 @@ public abstract class Vehicle implements Comparable<Vehicle> {
 		this.color = color;
 		this.numWheels = numWheels;
 		this.maxSpeed  = maxSpeed;
-		// TODO licensePlate = No License Plate;
+		licensePlate = LicensePlate.noLicensePlate();
 	}
 
 	// ----------------------------
@@ -73,9 +73,12 @@ public abstract class Vehicle implements Comparable<Vehicle> {
 	// Setters
 	/**
 	 * @param licensePlate the licensePlate to set
+	 * @return {@code true} if the license plate is valid and set as the license of the vehicle, else {@code false}
 	 */
-	public void setLicensePlate(LicensePlate licensePlate) {
-		this.licensePlate = licensePlate;
+	public boolean setLicensePlate(String licensePlate) {
+		boolean canChange = LicensePlate.isValid(licensePlate);
+		if (canChange) this.licensePlate = new LicensePlate(licensePlate);
+		return canChange;
 	}
 
 	/**

@@ -8,5 +8,5 @@ package g5.vehicles;
  */
 
 public enum PoliceType {
-	INEM, Bombeiros, GNR, PSP, PJ
+	INEM, Bombeiros, GNR, PSP, PJ;
 }

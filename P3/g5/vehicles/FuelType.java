@@ -8,17 +8,10 @@ package g5.vehicles;
  */
 
 public enum FuelType {
-	Ethanol, Methanol, Gasoline, Diesel, NaturalGas { @Override
+	Ethanol, Methanol, Gasoline, Diesel, NaturalGas { 
+		@Override
 		public String toString() { 
-		return "Natural Gas"; 
-	} 
+			return "Natural Gas"; 
+		} 
 	}, Hydrogen, Biodiesel;
-
-	public static boolean exists (FuelType fuelType) {
-		for (FuelType me : FuelType.values()) {
-			if (me.name().equals(fuelType))
-				return true;
-		}
-		return false;
-	}
 }
