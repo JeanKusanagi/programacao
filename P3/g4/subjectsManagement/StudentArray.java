@@ -1,6 +1,5 @@
 package g4.subjectsManagement;
-import aula4.prob1.people.Student;
-import aula4.prob1.subjectsManagement.DynamicArray;
+import g3.people.Student;
 
 /**
  * StudentArray

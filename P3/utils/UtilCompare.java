@@ -16,6 +16,7 @@ public class UtilCompare {
 	 * @param array Comparable array
 	 * @return maximum Comparable object
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static Comparable findMax(Comparable[] array) {
 		int maxIndex = 0;
 		for (int i = 1; i < array.length; i++) {
@@ -29,6 +30,7 @@ public class UtilCompare {
 	 * Orders a Comparable array, according to the compareTo() order. Uses quick sort.
 	 * @param array Comparable array to order
 	 */
+	@SuppressWarnings("rawtypes")
 	public static void sortArray(Comparable[] array) {
 		order(0, array.length, array);
 	}
@@ -44,6 +46,7 @@ public class UtilCompare {
 	 * @param end length of the {@code Comparable} array
 	 * @param array Comparable array
 	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private static void order(int start, int end, Comparable[] array) {
 		if (start-end < 20)
 			for(int i = 0; i < end-1; i++) {
@@ -70,6 +73,7 @@ public class UtilCompare {
 	 * @param end index of end position
 	 * @return new pivot position
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static int partition(int start, int end, Comparable[] array) { 
 		Comparable pivot = array[end-1];
 		int i1 = start-1;
@@ -93,6 +97,7 @@ public class UtilCompare {
 	 * @param indexOne
 	 * @param indexTwo
 	 */
+	@SuppressWarnings({ "rawtypes" })
 	private static void switchPos(int indexOne, int indexTwo, Comparable[] array) {
 		Comparable temp = array[indexOne];
 		array[indexOne] = array[indexTwo];

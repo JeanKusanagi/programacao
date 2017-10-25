@@ -1,10 +1,10 @@
 package g4;
 
-import aula4.prob1.people.Date;
-import aula4.prob1.people.Student;
-import aula4.prob1.people.StudentScholarship;
-import aula4.prob1.subjectsManagement.Professor;
-import aula4.prob1.subjectsManagement.Subject;
+import g3.people.Date;
+import g3.people.Student;
+import g3.people.StudentScholarship;
+import g4.subjectsManagement.Professor;
+import g4.subjectsManagement.Subject;
 
 /**
  * Ex4_SubjectsManagementTest

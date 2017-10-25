@@ -34,13 +34,13 @@ public class Ex2_VehiclesTest {
 		Car c2 = new Car(1997, "Yellow", 4, 170, m1);
 		CarPolice c3 = new CarPolice(1990, "Red", 4, 170, m1, PoliceType.PJ);
 
-		System.out.println(c3.setLicensePlate("AA-BB-0s0")); // false (invalid License Plate) 
-		System.out.println(c3.setLicensePlate("AA-BB-00")); // true (valid License Plate)
+		System.out.println(c3.setLicensePlate("29-BB-0s0")); // false (invalid License Plate) 
+		System.out.println(c3.setLicensePlate("29-BB-00")); // true (valid License Plate)
 
 		// Create Motorcycle and MotorcyclePolice
 		Motorcycle mc1 = new Motorcycle(2000, "Orange", 4, 400, m1);
 		MotorcyclePolice mc2 = new MotorcyclePolice(2000, "Orange", 4, 400, m1, PoliceType.GNR);
-		mc2.setLicensePlate("02-BF-ZZ");
+		mc2.setLicensePlate("02-BF-14");
 
 		// Create Bicycles and BicyclePolice
 		Bicycle b1 = new Bicycle(2005, "Purple", 2, 10);

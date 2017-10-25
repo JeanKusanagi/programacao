@@ -2,9 +2,8 @@ package g4.subjectsManagement;
 
 import java.util.Arrays;
 
-import aula4.prob1.people.Student;
-import aula4.prob1.subjectsManagement.Professor;
-import aula4.prob1.subjectsManagement.StudentArray;
+import g3.people.Student;
+
 
 /**
  * Subject

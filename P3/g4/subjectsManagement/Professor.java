@@ -1,6 +1,6 @@
 package g4.subjectsManagement;
-import aula4.prob1.people.Date;
-import aula4.prob1.people.Person;
+import g3.people.Date;
+import g3.people.Person;
 
 /**
  * Professor
