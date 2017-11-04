@@ -1,14 +1,9 @@
 # Programação
-MIECT UA
-
-O código aqui disponibilizado não pode ser copiado mas pode ser visualizado.
-O código é fornecido tal como está e embora tenha sido testado, poderá apresentar erros, pelos quais não me responsabilizo.
-
+Mestrado Integrado em Engenharia de Computadores e Telemática
+Universidade de Aveiro
 Pedro Teixeira
 
 ----------------
-Este repositório contém exercícios das seguintes disciplinas: 
- 
 Programação III 2017 
   - Aula 1. Introdução: metodologias de software; POO.
   - Aula 2. Programação por Objetos em Java: Conceitos principais: Encapsulamento (classes e objetos), Herança e Polimorfismo.
