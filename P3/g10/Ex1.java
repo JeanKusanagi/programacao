@@ -1,6 +1,7 @@
 package g10;
 
 import java.util.Iterator;
+
 import g10.ex1.dynamicArray.DynamicArray;
 import g10.ex1.linkedList.LinkedList;
 import g10.ex1.resources.figures.Circulo;
