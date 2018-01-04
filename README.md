@@ -7,21 +7,19 @@ Pedro Teixeira
 
 ----------------
 Programação III 2017 
-  - Aula 1. Introdução: metodologias de software; POO.
-  - Aula 2. Programação por Objetos em Java: Conceitos principais: Encapsulamento (classes e objetos), Herança e Polimorfismo.
-  - Aula 3. Classes e objetos: atributos e métodos; sobreposição de nomes de métodos; construtores e destrutor; atributos e funções estáticas.
-  - Aula 4. Herança: classes base e derivadas; herança simples; redefinição e sobreposição de métodos e variáveis; final, this, super; herança múltipla.
-  - Aula 5. Polimorfismo: generalização versus especialização; ligação estática e ligação dinâmica; classes abstractas.
-  - Aula 6. Interfaces, Classes internas.
-  - Aula 7. Java Lambda Expressions.
-  - Aula 8. Exceções: as palavras chave try, catch, finally, throws e throw; tipos de exceções e herança de exceções.
-  - Aula 9. Entrada e saída de dados: streams, compressão, serialização
-  - Aula 10. Swing e programação por eventos
-  - Aula 11. Padrões: Singleton, Fábrica, Decorador; composição versus herança.
-  - Aula 12. Classes genéricas: modelos e herança; modelos para coleções; iteradores.
-  - Aula 13. Java Reflection.
-  - Aula 14. Coleções em Java: Vector, Stack, ArrayList, Hashtable, HashMap, LinkedList, ...
-  - Aula 15. POO em C++ - comparação com Java.
+  - Aula 1. Ambiente de programação Eclipse (IDE). Usar construtores de Classes. Information Hiding. Overloading.
+  - Aula 2. Análise e desenho de aplicações segundo o paradigma Object Oriented. Utilizar mecanismos de Encapsulamento (Information Hiding) e Visibilidade. Conceitos this e static.
+  - Aula 3. Utilização de herança simples. Overriding de métodos. A referência super() e this(). Implementação dos métodos toString e equals.
+  - Aula 4. Utilização de herança e polimorfismo.
+  - Aula 5. Utilização de Classes Abstratas e Interfaces.
+  - Aula 6. Análise e concepção de um problema usando conceitos de programação por objetos em Java. Programação Funcional – Expressões Lambda.
+  - Aula 7. Utilização do Sistema de Entrada e Saída (I/O) de Java, Serialização e JARs.
+  - Aula 8. Introdução à utilização da biblioteca SWING :: Não disponível - ver Tic Tac Toe.
+  - Aula 9. Composição versus Herança. Utilização alguns padrões de software: Decorador, Singleton e Iterador.
+  - Aula 10. Utilização de Tipos de Dados Genéricos. Utilização de Genéricos em Coleções.
+  - Aula 11. Java Collections Framework. Java Stream API.
+  - Aula 12. Java Reflection.
+  - Aula 13. Resolução de problemas gerais de programação.
 
 Programação 2 2017
   - Aula 1. Revisões: Introdução ao LINUX; Biblioteca IO do JAVA
